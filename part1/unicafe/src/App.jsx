@@ -4,6 +4,28 @@ const Button = ({ onClick, text }) => {
   return <button onClick={onClick}>{text}</button>;
 };
 
+const Statistics = ({ good, neutral, bad, all }) => {
+  const GOOD_C = 1;
+  const NEUTRAL_C = 0;
+  const BAD_C = -1;
+  console.log("sum by cat:", good * GOOD_C + neutral * NEUTRAL_C + bad * BAD_C);
+  const average = (good * GOOD_C + neutral * NEUTRAL_C + bad * BAD_C) / all;
+  const positive = (good / all) * 100;
+
+  return (
+    <>
+      {" "}
+      <h2>Statistics</h2>
+      <p>good {good}</p>
+      <p>neutral {neutral}</p>
+      <p>bad {bad}</p>
+      <p>all {all}</p>
+      <p>average {average}</p>
+      <p>positive {positive}%</p>
+    </>
+  );
+};
+
 const App = () => {
   // save clicks of each button to its own state
   const [good, setGood] = useState(0);
@@ -25,13 +47,6 @@ const App = () => {
     setBad(bad + 1);
     setAll(1 + handleAll());
   };
-
-  const GOOD_C = 1;
-  const NEUTRAL_C = 0;
-  const BAD_C = -1;
-  console.log("sum by cat:", good * GOOD_C + neutral * NEUTRAL_C + bad * BAD_C);
-  const average = (good * GOOD_C + neutral * NEUTRAL_C + bad * BAD_C) / all;
-  const positive = (good / all) * 100;
   return (
     <div>
       <h1>Give Feedback</h1>
@@ -39,13 +54,7 @@ const App = () => {
       <Button text="neutral" onClick={handleNeutral} />
       <Button text="bad" onClick={handleBad} />
 
-      <h2>Statistics</h2>
-      <p>good {good}</p>
-      <p>neutral {neutral}</p>
-      <p>bad {bad}</p>
-      <p>all {all}</p>
-      <p>average {average}</p>
-      <p>positive {positive}%</p>
+      <Statistics good={good} neutral={neutral} bad={bad} all={all} />
     </div>
   );
 };
