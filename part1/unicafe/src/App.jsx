@@ -5,6 +5,15 @@ const Button = ({ onClick, text }) => {
 };
 
 const Statistics = ({ good, neutral, bad, all }) => {
+  if (!good && !neutral && !bad) {
+    return (
+      <>
+        <h2>Statistics</h2>
+        <p>No feedback given</p>
+      </>
+    );
+  }
+
   const GOOD_C = 1;
   const NEUTRAL_C = 0;
   const BAD_C = -1;
