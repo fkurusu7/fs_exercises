@@ -6,21 +6,28 @@ const Part = ({ part }) => (
   </p>
 );
 
-const Content = ({ parts }) => (
-  <>
-    {parts.map((part) => (
-      <Part key={part.id} part={part} />
-    ))}
-  </>
-);
+const Content = ({ parts }) => {
+  const totalExercises = parts.reduce((total, part) => {
+    return total + part.exercises;
+  }, 0);
 
-function Course({ course }) {
   return (
-    <div>
+    <>
+      {parts.map((part) => (
+        <Part key={part.id} part={part} />
+      ))}
+      <h3>total of {totalExercises} exercises</h3>
+    </>
+  );
+};
+
+function Course({ courses }) {
+  return courses.map((course) => (
+    <div key={course.id}>
       <Header course={course} />
       <Content parts={course.parts} />
     </div>
-  );
+  ));
 }
 
 export default Course;
