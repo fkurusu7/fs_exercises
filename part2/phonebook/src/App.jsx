@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 function App() {
-  const [persons, setPersons] = useState([{ name: "Fer Cruz" }]);
+  const [people, setPeople] = useState([{ name: "Fer Cruz" }]);
 
   const [newName, setNewName] = useState("");
 
@@ -11,11 +11,18 @@ function App() {
 
   const addName = (ev) => {
     ev.preventDefault();
-    console.log(newName);
-    const newObj = {
-      name: newName,
-    };
-    setPersons(persons.concat(newObj));
+    const nameAlreadyExists = people.some((person) => person.name === newName);
+
+    if (nameAlreadyExists) {
+      console.log(people);
+      console.log(`nameAlreadyExists ${newName} `, nameAlreadyExists);
+      alert(`${newName} is already added to phonebook`);
+    } else {
+      const newObj = {
+        name: newName,
+      };
+      setPeople(people.concat(newObj));
+    }
   };
 
   return (
@@ -31,7 +38,7 @@ function App() {
       </form>
       <h2>Numbers</h2>
       <ul>
-        {persons.map((person) => {
+        {people.map((person) => {
           return <li key={person.name}>{person.name}</li>;
         })}
       </ul>
