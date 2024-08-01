@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { useState } from "react";
+import phonebookServices from "./services/phonebook";
 
 const Person = ({ name, number }) => {
   return (
@@ -21,17 +23,19 @@ const Search = ({ searchValue, handleSearch }) => {
 };
 
 function App() {
-  const [originalPeople, setOriginalPeople] = useState([
-    { name: "Arto Hellas", number: "040-123456", id: 1 },
-    { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
-    { name: "Dan Abramov", number: "12-43-234345", id: 3 },
-    { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
-  ]);
-  const [people, setPeople] = useState(originalPeople);
+  const [people, setPeople] = useState([]);
+  const [originalPeople, setOriginalPeople] = useState([]);
 
   const [newName, setNewName] = useState("");
   const [newPhoneNumber, setNewPhoneNumber] = useState("");
   const [searchValue, setSearchValue] = useState();
+
+  useEffect(() => {
+    phonebookServices.getAll().then((initialPeople) => {
+      setPeople(initialPeople);
+      setOriginalPeople(initialPeople);
+    });
+  }, []);
 
   const handleNameChange = (ev) => {
     setNewName(ev.target.value);
@@ -45,21 +49,18 @@ function App() {
     const nameAlreadyExists = people.some((person) => person.name === newName);
 
     if (nameAlreadyExists) {
-      console.log(people);
-      console.log(`nameAlreadyExists ${newName} `, nameAlreadyExists);
       alert(`${newName} is already added to phonebook`);
     } else {
       const newObj = {
         name: newName,
         number: newPhoneNumber,
-        id: people.length + 1,
       };
-      const updatedPeople = people.concat(newObj);
-      setPeople(updatedPeople);
-      setOriginalPeople(updatedPeople);
-      setNewName("");
-      setNewPhoneNumber("");
-      setSearchValue("");
+
+      phonebookServices.create(newObj).then((returnedPerson) => {
+        setPeople(people.concat(returnedPerson));
+        setNewName("");
+        setNewPhoneNumber("");
+      });
     }
   };
 
@@ -104,7 +105,7 @@ function App() {
       <h2>Numbers</h2>
       <ul>
         {people.map((person) => (
-          <Person key={person.name} name={person.name} number={person.number} />
+          <Person key={person.id} name={person.name} number={person.number} />
         ))}
       </ul>
     </div>
