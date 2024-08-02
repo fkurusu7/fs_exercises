@@ -27,4 +27,11 @@ const deleteP = (id) => {
     });
 };
 
-export default { getAll, create, deleteP };
+const update = (id, newObj) => {
+  console.log(`${BASE_URL}/${id}`);
+  console.log(newObj);
+  const request = axios.put(`${BASE_URL}/${id}`, newObj);
+  return request.then((res) => res.data);
+};
+
+export default { getAll, create, deleteP, update };

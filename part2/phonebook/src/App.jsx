@@ -46,10 +46,29 @@ function App() {
 
   const addName = (ev) => {
     ev.preventDefault();
-    const nameAlreadyExists = people.some((person) => person.name === newName);
+    const foundPerson = people.find((person) => person.name === newName);
+    if (foundPerson) {
+      if (foundPerson.number !== newPhoneNumber) {
+        const confirmedChange = window.confirm(
+          `${foundPerson.name} is already added to phonebook, replace the old number with a new one?`
+        );
 
-    if (nameAlreadyExists) {
-      alert(`${newName} is already added to phonebook`);
+        const newObject = { name: newName, number: newPhoneNumber };
+        if (confirmedChange) {
+          phonebookServices
+            .update(foundPerson.id, newObject)
+            .then((returnedPerson) =>
+              setPeople(
+                people.map((p) =>
+                  p.id !== foundPerson.id ? p : returnedPerson
+                )
+              )
+            )
+            .catch((error) => {
+              console.log("Error", error);
+            });
+        }
+      }
     } else {
       const newObj = {
         name: newName,
@@ -85,13 +104,9 @@ function App() {
     if (result) {
       const response = phonebookServices.deleteP(id).then((returnedDeleted) => {
         console.log(returnedDeleted);
-        setPeople([
-          ...people,
-          people.filter((person) => {
-            console.log(person.id !== returnedDeleted.id);
-            return person.id !== returnedDeleted.id;
-          }),
-        ]);
+        setPeople(
+          people.map((p) => (p.id !== returnedDeleted.id ? p : returnedDeleted))
+        );
       });
     }
   };
