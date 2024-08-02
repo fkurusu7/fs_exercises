@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import { useState } from "react";
 import phonebookServices from "./services/phonebook";
 
-const Person = ({ name, number }) => {
+const Person = ({ name, number, onDelete }) => {
   return (
     <>
       <li>
-        {name} {number}
+        {name} {number} <button onClick={onDelete}>delete</button>
       </li>
       <br />
     </>
@@ -78,6 +78,24 @@ function App() {
     }
   };
 
+  const handleDeletion = (id) => {
+    console.log(id);
+    var result = confirm("Do you want to delete it?");
+
+    if (result) {
+      const response = phonebookServices.deleteP(id).then((returnedDeleted) => {
+        console.log(returnedDeleted);
+        setPeople([
+          ...people,
+          people.filter((person) => {
+            console.log(person.id !== returnedDeleted.id);
+            return person.id !== returnedDeleted.id;
+          }),
+        ]);
+      });
+    }
+  };
+
   return (
     <div>
       <h1>PhoneBook</h1>
@@ -105,7 +123,12 @@ function App() {
       <h2>Numbers</h2>
       <ul>
         {people.map((person) => (
-          <Person key={person.id} name={person.name} number={person.number} />
+          <Person
+            key={person.id}
+            name={person.name}
+            number={person.number}
+            onDelete={() => handleDeletion(person.id)}
+          />
         ))}
       </ul>
     </div>

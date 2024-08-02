@@ -15,4 +15,16 @@ const create = (newObj) => {
   return request.then((res) => res.data);
 };
 
-export default { getAll, create };
+const deleteP = (id) => {
+  return axios
+    .delete(`${BASE_URL}/${id}`)
+    .then((p) => {
+      console.log("AXIOS Del", p.data);
+      return p.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+export default { getAll, create, deleteP };
