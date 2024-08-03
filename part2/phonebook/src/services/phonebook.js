@@ -23,7 +23,7 @@ const deleteP = (id) => {
       return p.data;
     })
     .catch((error) => {
-      console.log(error);
+      throw new Error(error);
     });
 };
 

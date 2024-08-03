@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useState } from "react";
 import phonebookServices from "./services/phonebook";
+import Notification from "./Notification";
 
 const Person = ({ name, number, onDelete }) => {
   return (
@@ -29,6 +30,9 @@ function App() {
   const [newName, setNewName] = useState("");
   const [newPhoneNumber, setNewPhoneNumber] = useState("");
   const [searchValue, setSearchValue] = useState();
+  const [showMessage, setShowMessage] = useState(false);
+  const [message, setMessage] = useState("");
+  const [cssClass, setCssClass] = useState("");
 
   useEffect(() => {
     phonebookServices.getAll().then((initialPeople) => {
@@ -44,6 +48,17 @@ function App() {
     setNewPhoneNumber(ev.target.value);
   };
 
+  const handleMessage = (cssClass, message) => {
+    setShowMessage(true);
+    setCssClass(cssClass);
+    setMessage(message);
+    setTimeout(() => {
+      setShowMessage(false);
+      setCssClass("");
+      setMessage("");
+    }, 5000);
+  };
+
   const addName = (ev) => {
     ev.preventDefault();
     const foundPerson = people.find((person) => person.name === newName);
@@ -57,13 +72,14 @@ function App() {
         if (confirmedChange) {
           phonebookServices
             .update(foundPerson.id, newObject)
-            .then((returnedPerson) =>
+            .then((returnedPerson) => {
               setPeople(
                 people.map((p) =>
                   p.id !== foundPerson.id ? p : returnedPerson
                 )
-              )
-            )
+              );
+              handleMessage("success", `${newName} added`);
+            })
             .catch((error) => {
               console.log("Error", error);
             });
@@ -79,6 +95,7 @@ function App() {
         setPeople(people.concat(returnedPerson));
         setNewName("");
         setNewPhoneNumber("");
+        handleMessage("success", `${newName} added`);
       });
     }
   };
@@ -97,17 +114,28 @@ function App() {
     }
   };
 
-  const handleDeletion = (id) => {
+  const handleDeletion = (id, name) => {
     console.log(id);
     var result = confirm("Do you want to delete it?");
 
     if (result) {
-      const response = phonebookServices.deleteP(id).then((returnedDeleted) => {
-        console.log(returnedDeleted);
-        setPeople(
-          people.map((p) => (p.id !== returnedDeleted.id ? p : returnedDeleted))
-        );
-      });
+      phonebookServices
+        .deleteP(id)
+        .then((returnedDeleted) => {
+          console.log("*********", returnedDeleted);
+          setPeople(
+            people.map((p) =>
+              p.id !== returnedDeleted.id ? p : returnedDeleted
+            )
+          );
+        })
+        .catch((_error) => {
+          setCssClass("error");
+          setMessage(
+            `Information of ${name} has already been removed from server`
+          );
+          setShowMessage(true);
+        });
     }
   };
 
@@ -116,6 +144,7 @@ function App() {
       <h1>PhoneBook</h1>
       <Search searchValue={searchValue} handleSearch={handleSearch} />
       <br />
+      {showMessage && <Notification message={message} cssClass={cssClass} />}
       <form onSubmit={addName}>
         <div>
           name:
@@ -142,7 +171,7 @@ function App() {
             key={person.id}
             name={person.name}
             number={person.number}
-            onDelete={() => handleDeletion(person.id)}
+            onDelete={() => handleDeletion(person.id, person.name)}
           />
         ))}
       </ul>
