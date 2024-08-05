@@ -3,7 +3,7 @@ import countriesService from "./services/countries";
 
 function Country({ country }) {
   return (
-    <div className="country">
+    <div className="country" key={country.id}>
       <h1>{country.name}</h1>
       <div className="info">
         <p>
@@ -14,8 +14,8 @@ function Country({ country }) {
         </p>
         <h2>Languages:</h2>
         <ul>
-          {Object.entries(country.langs).map(([_, value]) => (
-            <li>{value}</li>
+          {Object.entries(country.langs).map(([_, value], idx) => (
+            <li key={country.id + idx}>{value}</li>
           ))}
         </ul>
       </div>
@@ -23,8 +23,9 @@ function Country({ country }) {
     </div>
   );
 }
+
 function App() {
-  const [searchCountry, setSearchCountry] = useState(undefined);
+  const [searchCountry, setSearchCountry] = useState("");
   const [initialCountries, setInitialCountries] = useState([]);
   const [foundCountries, setFoundCountries] = useState(null);
 
@@ -46,9 +47,10 @@ function App() {
         .filter((c) =>
           c.name.common.toLowerCase().includes(searchCountry.toLowerCase())
         )
-        .reduce((acc, country) => {
+        .reduce((acc, country, currIdx) => {
           // console.log(acc, country);
           acc.push({
+            id: country.name.common + country.area + currIdx,
             name: country.name.common,
             capital: country.capital,
             area: country.area,
@@ -58,14 +60,21 @@ function App() {
           return acc;
         }, []);
 
+      console.log(countries);
       setFoundCountries(countries);
     } else {
       setFoundCountries([]);
     }
   }, [searchCountry]);
 
-  // console.log(foundCountries);
-  console.log(initialCountries);
+  function handleShowCountry(name) {
+    // console.log(name);
+    // console.log(foundCountries);
+    // const country = foundCountries.filter((c) => c.name === name);
+    // console.log(country);
+    setFoundCountries(foundCountries.filter((c) => c.name === name));
+  }
+
   return (
     <div className="container">
       <div className="search">
@@ -78,14 +87,21 @@ function App() {
         />
       </div>
       <div className="found-countries">
-        {/*  */}
         {foundCountries && foundCountries.length <= 10 ? (
           foundCountries.length === 1 ? (
             <Country country={foundCountries[0]} />
           ) : (
             <ul className="countries-list">
               {foundCountries.map((country) => (
-                <li key={country.name}>{country.name}</li>
+                <li key={country.id}>
+                  <span>{country.name}</span>
+                  <button
+                    className="btn"
+                    onClick={() => handleShowCountry(country.name)}
+                  >
+                    show
+                  </button>
+                </li>
               ))}
             </ul>
           )
