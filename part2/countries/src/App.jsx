@@ -1,6 +1,28 @@
 import { useEffect, useState } from "react";
 import countriesService from "./services/countries";
 
+function Country({ country }) {
+  return (
+    <div className="country">
+      <h1>{country.name}</h1>
+      <div className="info">
+        <p>
+          Capital <span>{country.capital}</span>
+        </p>
+        <p>
+          Area <span> {country.area}</span>
+        </p>
+        <h2>Languages:</h2>
+        <ul>
+          {Object.entries(country.langs).map(([_, value]) => (
+            <li>{value}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="flag">{country.flag}</div>
+    </div>
+  );
+}
 function App() {
   const [searchCountry, setSearchCountry] = useState(undefined);
   const [initialCountries, setInitialCountries] = useState([]);
@@ -26,7 +48,13 @@ function App() {
         )
         .reduce((acc, country) => {
           // console.log(acc, country);
-          acc.push({ name: country.name.common });
+          acc.push({
+            name: country.name.common,
+            capital: country.capital,
+            area: country.area,
+            langs: country.languages,
+            flag: country.flag,
+          });
           return acc;
         }, []);
 
@@ -37,10 +65,11 @@ function App() {
   }, [searchCountry]);
 
   // console.log(foundCountries);
+  console.log(initialCountries);
   return (
-    <div>
-      <div>
-        <label htmlFor="find">find countries: </label>
+    <div className="container">
+      <div className="search">
+        <label htmlFor="find">find countries info</label>
         <input
           type="text"
           id="find"
@@ -48,17 +77,22 @@ function App() {
           onChange={handleSearchCountry}
         />
       </div>
-      <div>
+      <div className="found-countries">
+        {/*  */}
         {foundCountries && foundCountries.length <= 10 ? (
-          <ul>
-            {Array.isArray(foundCountries)
-              ? foundCountries.map((country) => (
-                  <li key={country.name}>{country.name}</li>
-                ))
-              : foundCountries}
-          </ul>
+          foundCountries.length === 1 ? (
+            <Country country={foundCountries[0]} />
+          ) : (
+            <ul className="countries-list">
+              {foundCountries.map((country) => (
+                <li key={country.name}>{country.name}</li>
+              ))}
+            </ul>
+          )
         ) : (
-          <p>Too many matches, specify another filter</p>
+          <p className="too-many-countries">
+            Too many matches, specify another filter
+          </p>
         )}
       </div>
     </div>
