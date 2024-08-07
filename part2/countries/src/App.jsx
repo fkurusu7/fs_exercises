@@ -1,7 +1,45 @@
 import { useEffect, useState } from "react";
 import countriesService from "./services/countries";
+import weatherService from "./services/weather";
 
 function Country({ country }) {
+  const [weather, setWeather] = useState(null);
+
+  const BASE_URL_ICONS_WEATHER = "https://openweathermap.org/img/wn/";
+  const iconExt = "@2x.png";
+
+  useEffect(
+    function () {
+      weatherService
+        .getWeather(country.capital[0], country.fifa)
+        .then((wReturned) => {
+          // console.log(wReturned);
+          // console.log(wReturned.weather[0].icon);
+          const obj = {
+            temp: Number(wReturned.main.temp - 273.15).toFixed(2) + "ºC",
+            wind: wReturned.wind.speed + "m/s",
+            iconUrl: `${BASE_URL_ICONS_WEATHER}${wReturned.weather[0].icon}${iconExt}`,
+          };
+          setWeather(obj);
+        });
+    },
+    [country]
+  );
+
+  // useEffect(
+  //   function () {
+  //     weatherService.getIcon(weather.icon).then((iconReturned) => {
+  //       console.log(iconReturned);
+  //       setIcon(iconReturned);
+  //     });
+  //   },
+  //   [weather]
+  // );
+
+  // console.log(country);
+  // console.log(weather);
+  // console.log(icon);
+
   return (
     <div className="country" key={country.id}>
       <h1>{country.name}</h1>
@@ -20,6 +58,14 @@ function Country({ country }) {
         </ul>
       </div>
       <div className="flag">{country.flag}</div>
+      {weather && (
+        <div className="weather">
+          <h2>Weather in {country.capital}</h2>
+          <p className="temp">Temperature {weather.temp}</p>
+          <p className="wind">Wind {weather.wind}</p>
+          <img src={weather.iconUrl} alt="Weather Icon" />
+        </div>
+      )}
     </div>
   );
 }
@@ -53,6 +99,7 @@ function App() {
             id: country.name.common + country.area + currIdx,
             name: country.name.common,
             capital: country.capital,
+            fifa: country.fifa,
             area: country.area,
             langs: country.languages,
             flag: country.flag,
@@ -60,7 +107,7 @@ function App() {
           return acc;
         }, []);
 
-      console.log(countries);
+      // console.log(countries);
       setFoundCountries(countries);
     } else {
       setFoundCountries([]);
