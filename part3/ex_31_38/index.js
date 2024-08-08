@@ -1,8 +1,20 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 
 const app = express();
 app.use(express.json());
+app.use(cors());
+
+morgan.token("type", function (req, res) {
+  return JSON.stringify(req.body);
+});
+morgan.format(
+  "kurusu",
+  ":method :url :status :response-time ms - :res[content-length] :type"
+);
+app.use(morgan("kurusu"));
+// POST /api/persons 200 2.818 ms - 53 {"name":"Fer Cuva","number":"01-654321-123"}
 
 let persons = [
   {
@@ -25,17 +37,12 @@ let persons = [
     name: "Mary Poppendieck",
     number: "39-23-6423122",
   },
+  {
+    id: "5",
+    name: "Fer Cruz",
+    number: "12-23-6423122",
+  },
 ];
-
-morgan.token("type", function (req, res) {
-  return JSON.stringify(req.body);
-});
-morgan.format(
-  "kurusu",
-  ":method :url :status :response-time ms - :res[content-length] :type"
-);
-app.use(morgan("kurusu"));
-// POST /api/persons 200 2.818 ms - 53 {"name":"Fer Cuva","number":"01-654321-123"}
 
 app.get("/", (req, res) => {
   res.send("<h1>Hello, Express!</h1>");
@@ -102,7 +109,7 @@ app.post("/api/persons", (req, res) => {
   res.json(person);
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
