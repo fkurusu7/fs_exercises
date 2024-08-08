@@ -6,6 +6,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// show static content
+app.use(express.static("dist"));
+
 morgan.token("type", function (req, res) {
   return JSON.stringify(req.body);
 });
