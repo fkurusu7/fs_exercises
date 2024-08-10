@@ -43,5 +43,4 @@ if (process.argv.length === 5) {
     console.log(`added ${name} number ${number} to phonebook`);
     mongoose.connection.close();
   });
-  process.exit(0);
 }
