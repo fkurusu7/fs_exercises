@@ -28,8 +28,8 @@ const deleteP = (id) => {
 };
 
 const update = (id, newObj) => {
-  console.log(`${BASE_URL}/${id}`);
-  console.log(newObj);
+  console.log(`REACT put: ${BASE_URL}/${id}`);
+  console.log("UPDATE obj: ", newObj);
   const request = axios.put(`${BASE_URL}/${id}`, newObj);
   return request.then((res) => res.data);
 };

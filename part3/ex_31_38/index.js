@@ -90,6 +90,19 @@ app.post("/api/persons", (req, res) => {
   });
 });
 
+app.put("/api/persons/:id", (req, res, next) => {
+  const id = req.params.id;
+  const body = req.body;
+
+  const person = {
+    name: body.name,
+    number: body.number,
+  };
+  Phonebook.findByIdAndUpdate(id, person, { new: true })
+    .then((personReturned) => res.json(personReturned))
+    .catch((error) => next(error));
+});
+
 // *************************************
 // ************ MIDDLEWAREs ************
 // *************************************

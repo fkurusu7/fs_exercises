@@ -78,7 +78,9 @@ function App() {
                   p.id !== foundPerson.id ? p : returnedPerson
                 )
               );
-              handleMessage("success", `${newName} added`);
+              setNewName("");
+              setNewPhoneNumber("");
+              handleMessage("success", `${newName} updated`);
             })
             .catch((error) => {
               console.log("Error", error);
@@ -131,7 +133,7 @@ function App() {
         })
         .catch((_error) => {
           setCssClass("error");
-          setMessage(
+          handleMessage(
             `Information of ${name} has already been removed from server`
           );
           setShowMessage(true);
