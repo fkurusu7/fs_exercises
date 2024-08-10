@@ -29,14 +29,24 @@ app.get("/", (req, res) => {
   res.send("<h1>Hello, Express!</h1>");
 });
 
-app.get("/info", (req, res) => {
-  const totalPersons = `<p>Phonebook has info for ${persons.length} people</p>
-  `;
+app.get("/info", async (req, res) => {
+  try {
+    // Count all documents in the Phonebook collection
+    const totalPeople = await Phonebook.countDocuments({});
 
-  const fullDate = new Date(8.64e15).toString();
-  const stringDate = `<p>${fullDate}</p>`;
+    // Create the response content
+    const totalPersons = `<p>Phonebook has info for ${totalPeople} people</p>`;
 
-  res.send(`<h1>Hello, FullStack!</h1>${totalPersons}${stringDate}`);
+    // Format the date
+    const fullDate = new Date().toString(); // Use current date instead of the hardcoded value
+    const stringDate = `<p>${fullDate}</p>`;
+
+    // Send the response
+    res.send(`<h1>Hello, FullStack!</h1>${totalPersons}${stringDate}`);
+  } catch (error) {
+    // Handle any errors
+    res.status(500).send("An error occurred while retrieving information.");
+  }
 });
 
 app.get("/api/persons", (req, res) => {
