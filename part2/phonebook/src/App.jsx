@@ -84,6 +84,10 @@ function App() {
             })
             .catch((error) => {
               console.log("Error", error);
+              handleMessage(
+                "error",
+                `Person validation failed: ${error.response.data.error}`
+              );
             });
         }
       }
@@ -93,12 +97,21 @@ function App() {
         number: newPhoneNumber,
       };
 
-      phonebookServices.create(newObj).then((returnedPerson) => {
-        setPeople(people.concat(returnedPerson));
-        setNewName("");
-        setNewPhoneNumber("");
-        handleMessage("success", `${newName} added`);
-      });
+      phonebookServices
+        .create(newObj)
+        .then((returnedPerson) => {
+          setPeople(people.concat(returnedPerson));
+          setNewName("");
+          setNewPhoneNumber("");
+          handleMessage("success", `${newName} added`);
+        })
+        .catch((error) => {
+          handleMessage(
+            "error",
+            `Person validation failed: ${error.response.data.error}`
+          );
+          console.log(error.response.data.error);
+        });
     }
   };
 
