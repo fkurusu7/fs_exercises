@@ -112,7 +112,7 @@ app.put("/api/persons/:id", (req, res, next) => {
   // };
   Phonebook.findByIdAndUpdate(
     id,
-    { name, person },
+    { name, number },
     { new: true, runValidators: true, context: "query" }
   )
     .then((personReturned) => res.json(personReturned))
