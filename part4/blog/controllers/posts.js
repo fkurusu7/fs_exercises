@@ -13,7 +13,6 @@ postsRouter.get("/", (request, response) =>
 
 // SAVE a Post
 postsRouter.post("/", (req, res, next) => {
-  console.log("POST......");
   const body = req.body;
 
   const post = new Post({
