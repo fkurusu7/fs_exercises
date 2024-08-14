@@ -86,4 +86,14 @@ describe("total likes", () => {
     const result = listHelper.totalLikes(blogs);
     assert.strictEqual(result, 36);
   });
+
+  test("favorite blog post, which blog post has the most likes", () => {
+    const maxLikesPost = {
+      title: "Canonical string reduction",
+      author: "Edsger W. Dijkstra",
+      likes: 12,
+    };
+    const result = listHelper.favoriteBlog(blogs);
+    assert.deepStrictEqual(result, maxLikesPost);
+  });
 });
