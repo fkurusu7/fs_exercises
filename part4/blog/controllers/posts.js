@@ -5,9 +5,10 @@ const logger = require("./../utils/logger");
 // FETCH all Posts
 
 // notesRouter.get("/", (request, response) => {
-postsRouter.get("/", (request, response) =>
-  Post.find({}).then((posts) => response.json(posts))
-);
+postsRouter.get("/", async (req, res) => {
+  const posts = await Post.find({});
+  res.json(posts);
+});
 
 // FETCH a Single Post
 
