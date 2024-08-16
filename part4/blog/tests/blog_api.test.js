@@ -27,4 +27,10 @@ test.only("should return posts in JSON format", async () => {
     .expect("Content-Type", /application\/json/);
 });
 
+test.only("should validate the unique identifier of any post be called id, not _id", async () => {
+  const post = await helper.postsInDB();
+  const keys = Object.keys(post[0]);
+  assert(keys.includes("id"));
+});
+
 after(async () => await mongoose.connection.close());
