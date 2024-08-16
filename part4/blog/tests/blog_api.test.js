@@ -33,4 +33,19 @@ test.only("should validate the unique identifier of any post be called id, not _
   assert(keys.includes("id"));
 });
 
+test("should create a new post", async () => {
+  let currentPosts = await helper.postsInDB();
+  const actual = currentPosts.length + 1;
+  const newPost = new Post({
+    title: "new post test",
+    author: "lucho",
+    url: "url://",
+    likes: 3,
+  });
+  api.post(BASE_PATH).send(newPost).expect(201);
+  currentPosts = await helper.postsInDB();
+  const expected = currentPosts.length;
+  assert.strictEqual(actual, expected);
+});
+
 after(async () => await mongoose.connection.close());
