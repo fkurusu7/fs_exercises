@@ -15,7 +15,6 @@ postsRouter.get("/", async (req, res) => {
 // SAVE a Post
 postsRouter.post("/", async (req, res, next) => {
   const body = req.body;
-  console.log("BODY\n", body);
 
   const post = new Post({
     title: body.title,
@@ -24,11 +23,24 @@ postsRouter.post("/", async (req, res, next) => {
     likes: body.likes || 0,
   });
 
-  const savedPost = await post.save();
-  res.status(201).json(savedPost);
+  try {
+    const savedPost = await post.save();
+    res.status(201).json(savedPost);
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Delete a Post
+postsRouter.delete("/:id", async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    await Post.findOneAndDelete(id);
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
 
 // UPDATE a Post
 
