@@ -13,20 +13,19 @@ postsRouter.get("/", async (req, res) => {
 // FETCH a Single Post
 
 // SAVE a Post
-postsRouter.post("/", (req, res, next) => {
+postsRouter.post("/", async (req, res, next) => {
   const body = req.body;
+  console.log("BODY\n", body);
 
   const post = new Post({
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes,
+    likes: body.likes || 0,
   });
 
-  post
-    .save()
-    .then((postSaved) => res.status(201).json(postSaved))
-    .catch((error) => next(error)); // type: ValidationError
+  const savedPost = await post.save();
+  res.status(201).json(savedPost);
 });
 
 // Delete a Post

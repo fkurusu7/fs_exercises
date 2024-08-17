@@ -20,14 +20,14 @@ beforeEach(async () => {
   console.log(`==> Test DB setup done.`);
 });
 
-test.only("should return posts in JSON format", async () => {
+test("should return posts in JSON format", async () => {
   await api
     .get(BASE_PATH)
     .expect(200)
     .expect("Content-Type", /application\/json/);
 });
 
-test.only("should validate the unique identifier of any post be called id, not _id", async () => {
+test("should validate the unique identifier of any post be called id, not _id", async () => {
   const post = await helper.postsInDB();
   const keys = Object.keys(post[0]);
   assert(keys.includes("id"));
@@ -36,16 +36,30 @@ test.only("should validate the unique identifier of any post be called id, not _
 test("should create a new post", async () => {
   let currentPosts = await helper.postsInDB();
   const actual = currentPosts.length + 1;
-  const newPost = new Post({
+  const newPost = {
     title: "new post test",
     author: "lucho",
     url: "url://",
     likes: 3,
-  });
-  api.post(BASE_PATH).send(newPost).expect(201);
+  };
+  await api.post(BASE_PATH).send(newPost).expect(201);
   currentPosts = await helper.postsInDB();
   const expected = currentPosts.length;
   assert.strictEqual(actual, expected);
+});
+
+test.only("should verify the likes prop if missing the default value is 0", async () => {
+  const newPostWithoutLikes = {
+    title: "new post test",
+    author: "lucho",
+    url: "url://",
+  };
+
+  await api
+    .post(BASE_PATH)
+    .send(newPostWithoutLikes)
+    .expect(201)
+    .then((res) => assert.strictEqual(res.body.likes, 0));
 });
 
 after(async () => await mongoose.connection.close());
