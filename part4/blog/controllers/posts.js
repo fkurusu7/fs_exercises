@@ -43,5 +43,25 @@ postsRouter.delete("/:id", async (req, res, next) => {
 });
 
 // UPDATE a Post
+postsRouter.put("/:id", async (req, res, next) => {
+  const id = req.params.id;
+  const { title, author, url, likes } = req.body;
+
+  try {
+    const updatedPost = await Post.findByIdAndUpdate(
+      id,
+      { title, author, url, likes },
+      { new: true, runValidators: true, context: "query" }
+    );
+
+    if (!updatedPost) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    res.status(200).json(updatedPost);
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = postsRouter;

@@ -98,5 +98,45 @@ describe("There is initially some posts saved", () => {
       await api.delete(`${BASE_PATH}/${id}`).expect(204);
     });
   });
+
+  describe("Update Posts", async () => {
+    test("should update author", async () => {
+      const posts = await helper.postsInDB();
+      const postUpdateAuthor = posts[0];
+      const newAuthorName = "Feliciano";
+      postUpdateAuthor.author = newAuthorName;
+
+      const updatedPost = await api
+        .put(`${BASE_PATH}/${postUpdateAuthor.id}`)
+        .send(postUpdateAuthor)
+        .expect(200);
+
+      assert.strictEqual(updatedPost.body.author, newAuthorName);
+    });
+
+    test("should update likes", async () => {
+      const posts = await helper.postsInDB();
+      const postUpdateLikes = posts[1];
+      postUpdateLikes.likes = postUpdateLikes.likes + 1;
+
+      const updatedPost = await api
+        .put(`${BASE_PATH}/${postUpdateLikes.id}`)
+        .send(postUpdateLikes)
+        .expect(200);
+
+      assert.strictEqual(updatedPost.body.likes, 4);
+    });
+
+    test("should not update if post do not exist", async () => {
+      const postUpdate = {
+        title: "no post",
+        author: "no update",
+        url: "http://noupdate.com",
+        likes: 1,
+      };
+      const id = await helper.nonExistingID();
+      await api.put(`${BASE_PATH}/${id}`).send(postUpdate).expect(404);
+    });
+  });
 });
 after(async () => await mongoose.connection.close());

@@ -17,10 +17,10 @@ const initialPosts = [
 
 const nonExistingID = async () => {
   const post = new Post({
-    title: "Second Post",
-    author: "Paz",
-    url: "Catalina.com",
-    likes: 3,
+    title: "SHOULD NOT exist",
+    author: "24s",
+    url: "catalina.com",
+    likes: 1,
   });
   await post.save();
   await post.deleteOne();
