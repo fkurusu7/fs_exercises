@@ -135,7 +135,16 @@ describe("There is initially some posts saved", () => {
         likes: 1,
       };
       const id = await helper.nonExistingID();
-      await api.put(`${BASE_PATH}/${id}`).send(postUpdate).expect(404);
+      await api
+        .put(`${BASE_PATH}/${id}`)
+        .send(postUpdate)
+        .expect(404)
+        .expect("Content-Type", /application\/json/);
+      // // Check the response body
+      // .expect((res) => res.body)
+      // .toHaveProperty("error")
+      // .expect((res) => res.body.error)
+      // .toBe("Post not found");
     });
   });
 });
