@@ -16,6 +16,10 @@ const postSchema = new mongoose.Schema({
     required: [true, "URL is required"],
   },
   likes: Number,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
 });
 
 postSchema.set("toJSON", {
