@@ -69,10 +69,22 @@ postsRouter.post("/", async (req, res, next) => {
 
 // Delete a Post
 postsRouter.delete("/:id", async (req, res, next) => {
-  const id = req.params.id;
   try {
-    await Post.findOneAndDelete(id);
-    res.status(204).end();
+    const decodedToken = jwt.verify(req.token, process.env.SECRET);
+    if (!decodedToken) {
+      return res.status(401).json({ error: "invalid token" });
+    }
+
+    const userId = decodedToken.id;
+    const postId = req.params.id;
+
+    const result = await Post.deleteOne({ _id: postId, user: userId });
+
+    if (result.deletedCount === 1) {
+      res.status(204).end();
+    } else {
+      res.status(400).json({ error: "post not found" });
+    }
   } catch (error) {
     next(error);
   }
