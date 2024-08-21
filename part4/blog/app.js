@@ -36,7 +36,7 @@ morgan.format(
   ":method :url :status :response-time ms - :res[content-length] :body"
 );
 app.use(morgan("mFormat"));
-
+app.use(middleware.tokenExtractor);
 // ***********
 // ROUTES
 app.use("/api/blog/posts", postsRouter);

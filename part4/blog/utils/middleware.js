@@ -4,7 +4,23 @@ const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: "unknown endpoint" });
 };
 
+const tokenExtractor = (req, res, next) => {
+  const authorization = req.get("authorization");
+  // console.log("Token Ext: ", authorization);
+
+  if (authorization && authorization.startsWith("Bearer ")) {
+    req.token = authorization.replace("Bearer ", "");
+    // console.log("body: ", req.body);
+    // console.log("token: ", req.token);
+  }
+
+  next();
+};
+
 const errorHandler = (error, req, res, next) => {
+  // console.log(error.name);
+  // console.log(error.message);
+
   if (error.name === "CastError") {
     return res.status(400).json({ error: "malformatted ID" });
   } else if (error.name === "ValidationError") {
@@ -27,4 +43,4 @@ const errorHandler = (error, req, res, next) => {
   next(error);
 };
 
-module.exports = { unknownEndpoint, errorHandler };
+module.exports = { unknownEndpoint, tokenExtractor, errorHandler };

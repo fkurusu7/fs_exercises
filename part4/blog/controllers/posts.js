@@ -25,26 +25,28 @@ postsRouter.get("/", async (req, res, next) => {
 // FETCH a Single Post
 
 // SAVE a Post
-const getTokenFrom = (req) => {
-  const authorization = req.get("authorization");
+// const getTokenFrom = (req) => {
+//   const authorization = req.get("authorization");
 
-  if (authorization && authorization.startsWith("Bearer ")) {
-    return authorization.replace("Bearer ", "");
-  }
-  return null;
-};
+//   if (authorization && authorization.startsWith("Bearer ")) {
+//     return authorization.replace("Bearer ", "");
+//   }
+//   return null;
+// };
 
 postsRouter.post("/", async (req, res, next) => {
+  // logger.info("POST REQ: ", req.body);
+  // logger.info("POST token: ", req.token);
   try {
     const body = req.body;
-    const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET);
-    logger.info(`decodedToken: ${decodedToken}`);
+    const decodedToken = jwt.verify(req.token, process.env.SECRET);
+    // logger.info(`decodedToken: ${decodedToken}`);
     if (!decodedToken) {
       return res.status(401).json({ error: "invalid token" });
     }
 
     const user = await User.findById(decodedToken.id);
-    logger.info(`USER: ${user}`);
+    // logger.info(`USER: ${user}`);
 
     const post = new Post({
       title: body.title,
@@ -55,7 +57,7 @@ postsRouter.post("/", async (req, res, next) => {
     });
 
     const savedPost = await post.save();
-    console.log("SAVEd Post: ", savedPost);
+    // console.log("SAVEd Post: ", savedPost);
 
     user.posts = user.posts.concat(savedPost._id);
     await user.save();
