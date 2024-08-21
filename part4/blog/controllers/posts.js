@@ -1,4 +1,5 @@
 const postsRouter = require("express").Router();
+const jwt = require("jsonwebtoken");
 const Post = require("../models/post");
 const User = require("../models/user");
 const logger = require("./../utils/logger");
@@ -24,22 +25,35 @@ postsRouter.get("/", async (req, res, next) => {
 // FETCH a Single Post
 
 // SAVE a Post
+const getTokenFrom = (req) => {
+  const authorization = req.get("authorization");
+
+  if (authorization && authorization.startsWith("Bearer ")) {
+    return authorization.replace("Bearer ", "");
+  }
+  return null;
+};
+
 postsRouter.post("/", async (req, res, next) => {
-  console.log(req.body);
-  const body = req.body;
-  const userId = body.userId;
-  const user = await User.findById(userId);
-  console.log("USER: ", user);
-
-  const post = new Post({
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes || 0,
-    user: user.id,
-  });
-
   try {
+    const body = req.body;
+    const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET);
+    logger.info(`decodedToken: ${decodedToken}`);
+    if (!decodedToken) {
+      return res.status(401).json({ error: "invalid token" });
+    }
+
+    const user = await User.findById(decodedToken.id);
+    logger.info(`USER: ${user}`);
+
+    const post = new Post({
+      title: body.title,
+      author: body.author,
+      url: body.url,
+      likes: body.likes || 0,
+      user: user.id,
+    });
+
     const savedPost = await post.save();
     console.log("SAVEd Post: ", savedPost);
 
