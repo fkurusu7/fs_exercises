@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const Post = require("../models/post");
 const User = require("../models/user");
 const logger = require("./../utils/logger");
+const middleware = require("./../utils/middleware");
 
 // FETCH all Posts
 
@@ -34,19 +35,12 @@ postsRouter.get("/", async (req, res, next) => {
 //   return null;
 // };
 
-postsRouter.post("/", async (req, res, next) => {
+postsRouter.post("/", middleware.userExtractor, async (req, res, next) => {
   // logger.info("POST REQ: ", req.body);
   // logger.info("POST token: ", req.token);
   try {
     const body = req.body;
-    const decodedToken = jwt.verify(req.token, process.env.SECRET);
-    // logger.info(`decodedToken: ${decodedToken}`);
-    if (!decodedToken) {
-      return res.status(401).json({ error: "invalid token" });
-    }
-
-    const user = await User.findById(decodedToken.id);
-    // logger.info(`USER: ${user}`);
+    const user = req.user;
 
     const post = new Post({
       title: body.title,
@@ -57,8 +51,6 @@ postsRouter.post("/", async (req, res, next) => {
     });
 
     const savedPost = await post.save();
-    // console.log("SAVEd Post: ", savedPost);
-
     user.posts = user.posts.concat(savedPost._id);
     await user.save();
     res.status(201).json(savedPost);
@@ -70,12 +62,14 @@ postsRouter.post("/", async (req, res, next) => {
 // Delete a Post
 postsRouter.delete("/:id", async (req, res, next) => {
   try {
-    const decodedToken = jwt.verify(req.token, process.env.SECRET);
-    if (!decodedToken) {
-      return res.status(401).json({ error: "invalid token" });
-    }
+    // const decodedToken = jwt.verify(req.token, process.env.SECRET);
+    // if (!decodedToken) {
+    //   return res.status(401).json({ error: "invalid token" });
+    // }
+    const user = req.user;
+    logger.info(`USER route: ${user}`);
 
-    const userId = decodedToken.id;
+    const userId = req.id;
     const postId = req.params.id;
 
     const result = await Post.deleteOne({ _id: postId, user: userId });
