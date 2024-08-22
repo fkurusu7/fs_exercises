@@ -36,8 +36,8 @@ postsRouter.get("/", async (req, res, next) => {
 // };
 
 postsRouter.post("/", middleware.userExtractor, async (req, res, next) => {
-  // logger.info("POST REQ: ", req.body);
-  // logger.info("POST token: ", req.token);
+  logger.info("POST REQ: ", req.body);
+  logger.info("POST token: ", req.token);
   try {
     const body = req.body;
     const user = req.user;

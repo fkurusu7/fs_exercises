@@ -2,12 +2,15 @@ const { test, beforeEach, after, describe } = require("node:test");
 const assert = require("node:assert");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
+const bcrypt = require("bcrypt");
 const Post = require("./../models/post");
+const User = require("../models/user");
 const helper = require("./test_helper");
 const app = require("./../app");
 const api = supertest(app);
 
-const BASE_PATH = "/api/blog/posts";
+const POSTS_BASE_PATH = "/api/blog/posts";
+const LOGIN_BASE_PATH = "/api/login";
 
 describe("There is initially some posts saved", () => {
   beforeEach(async () => {
@@ -24,7 +27,7 @@ describe("There is initially some posts saved", () => {
   describe("GET notes", () => {
     test.only("should return posts in JSON format", async () => {
       await api
-        .get(BASE_PATH)
+        .get(POSTS_BASE_PATH)
         .expect(200)
         .expect("Content-Type", /application\/json/);
     });
@@ -37,6 +40,24 @@ describe("There is initially some posts saved", () => {
   });
 
   describe("Create Posts", () => {
+    let userFromToken = {};
+    beforeEach(async () => {
+      await User.deleteMany();
+      const passwordHash = await bcrypt.hash("password", 10);
+      const newUserObj = new User({
+        username: "root",
+        name: "Fkurusu",
+        passwordHash,
+      });
+      await newUserObj.save();
+      const loginObj = {
+        username: "root",
+        password: "password",
+      };
+      const loginRes = await api.post(LOGIN_BASE_PATH).send(loginObj);
+      userFromToken = loginRes.body;
+    });
+
     test.only("should create a new post", async () => {
       let currentPosts = await helper.postsInDB();
       const actual = currentPosts.length + 1;
@@ -46,7 +67,11 @@ describe("There is initially some posts saved", () => {
         url: "url://",
         likes: 3,
       };
-      await api.post(BASE_PATH).send(newPost).expect(201);
+      await api
+        .post(POSTS_BASE_PATH)
+        .set("Authorization", `Bearer ${userFromToken.token}`)
+        .send(newPost)
+        .expect(201);
       currentPosts = await helper.postsInDB();
       const expected = currentPosts.length;
       assert.strictEqual(actual, expected);
@@ -60,7 +85,8 @@ describe("There is initially some posts saved", () => {
       };
 
       await api
-        .post(BASE_PATH)
+        .post(POSTS_BASE_PATH)
+        .set("Authorization", `Bearer ${userFromToken.token}`)
         .send(newPostWithoutLikes)
         .expect(201)
         .then((res) => assert.strictEqual(res.body.likes, 0));
@@ -73,10 +99,27 @@ describe("There is initially some posts saved", () => {
       };
 
       await api
-        .post(BASE_PATH)
+        .post(POSTS_BASE_PATH)
+        .set("Authorization", `Bearer ${userFromToken.token}`)
         .send(newPostWithoutLikes)
         .expect(400)
         .then((res) => console.log(res.body));
+    });
+
+    test.only("should return status code 401 Unauthorized if token not provided", async () => {
+      const newPost = {
+        title: "new post test",
+        author: "lucho",
+        url: "url://",
+        likes: 3,
+      };
+
+      await api
+        .post(POSTS_BASE_PATH)
+        .set("Authorization", "Bearer 4s5d6rf7tv8byn9u")
+        .send(newPost)
+        .expect(401)
+        .then((res) => assert.deepEqual(res.body, { error: "token invalid" }));
     });
   });
 
@@ -86,7 +129,7 @@ describe("There is initially some posts saved", () => {
       const actual = actualPosts.length;
       const postToDelete = actualPosts[0];
 
-      await api.delete(`${BASE_PATH}/${postToDelete.id}`).expect(204);
+      await api.delete(`${POSTS_BASE_PATH}/${postToDelete.id}`).expect(204);
       const expectedPosts = await helper.postsInDB();
       const expected = expectedPosts.length;
       assert.strictEqual(actual - 1, expected);
@@ -95,7 +138,7 @@ describe("There is initially some posts saved", () => {
     test("should delete a Post and return 204 code status", async () => {
       const actualPosts = await helper.postsInDB();
       const id = actualPosts[0].id;
-      await api.delete(`${BASE_PATH}/${id}`).expect(204);
+      await api.delete(`${POSTS_BASE_PATH}/${id}`).expect(204);
     });
   });
 
@@ -107,7 +150,7 @@ describe("There is initially some posts saved", () => {
       postUpdateAuthor.author = newAuthorName;
 
       const updatedPost = await api
-        .put(`${BASE_PATH}/${postUpdateAuthor.id}`)
+        .put(`${POSTS_BASE_PATH}/${postUpdateAuthor.id}`)
         .send(postUpdateAuthor)
         .expect(200);
 
@@ -120,7 +163,7 @@ describe("There is initially some posts saved", () => {
       postUpdateLikes.likes = postUpdateLikes.likes + 1;
 
       const updatedPost = await api
-        .put(`${BASE_PATH}/${postUpdateLikes.id}`)
+        .put(`${POSTS_BASE_PATH}/${postUpdateLikes.id}`)
         .send(postUpdateLikes)
         .expect(200);
 
@@ -136,7 +179,7 @@ describe("There is initially some posts saved", () => {
       };
       const id = await helper.nonExistingID();
       await api
-        .put(`${BASE_PATH}/${id}`)
+        .put(`${POSTS_BASE_PATH}/${id}`)
         .send(postUpdate)
         .expect(404)
         .expect("Content-Type", /application\/json/);

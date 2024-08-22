@@ -8,21 +8,23 @@ const bcrypt = require("bcrypt");
 const app = require("./../app");
 const User = require("./../models/user");
 const helper = require("./../tests/test_helper");
-const BASE_PATH = "/api/users";
+const USER_BASE_PATH = "/api/users";
 const api = supertest(app);
 
 describe("", (params) => {
   beforeEach(async () => {
     await User.deleteMany({});
 
-    const passwordHash = await bcrypt.hash("sekret", 10);
+    const passwordHash = await bcrypt.hash("password", 10);
     const user = new User({ username: "root", passwordHash });
     await user.save();
+
+    await api.post();
   });
 
   test("should return one user", async () => {
     await api
-      .get(BASE_PATH)
+      .get(USER_BASE_PATH)
       .expect(200)
       .expect((res) => {
         assert.strictEqual(res.body.length, 1);
@@ -38,7 +40,7 @@ describe("", (params) => {
     };
 
     await api
-      .post(BASE_PATH)
+      .post(USER_BASE_PATH)
       .send(newUser)
       .expect(201)
       .expect("Content-Type", /application\/json/);
