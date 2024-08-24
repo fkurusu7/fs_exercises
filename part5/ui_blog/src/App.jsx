@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
-import Blog from "./components/Blog";
-import blogService from "./services/blogs";
+
+import blogService from "./services/posts";
 import authService from "./services/authentication";
 import Notification from "./components/Notification";
 import FormLogin from "./components/FormLogin";
+import FormPosts from "./components/FormPosts";
+import Post from "./components/Post";
+import "./index.css";
+import BlogHeader from "./components/BlogHeader";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [message, setMessage] = useState(null);
 
   // ***********************
@@ -15,10 +19,18 @@ const App = () => {
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const LOCAL_STORAGE_USER_KEY = "loggedInUser";
+  // ***********************
+
+  // ***************************
+  // ******** NEW POSTS ********
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [url, setUrl] = useState("");
+  // ***************************
 
   // LOAD ALL POSTS From DB
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    blogService.getAll().then((posts) => setPosts(posts));
   }, []);
 
   // CHECK if a USER is already logged in
@@ -28,7 +40,7 @@ const App = () => {
     if (userLoggedIn) {
       const user = JSON.parse(userLoggedIn);
       setUser(user);
-      // TODO: GET TOKEN and use it to create new posts
+      // TODO: GET TOKEN and use it to create new posts using setToken
     }
 
     // return () => {};
@@ -47,7 +59,10 @@ const App = () => {
 
     try {
       const user = await authService.login({ username, password });
+      console.log("USER LOGIN: ", user);
       window.localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(user));
+      blogService.setToken(user.token);
+      console.log("TOKEN LOGIN: ", user.token);
 
       setUser(user);
       handleMessage(`Welcome, ${user.name}. You are logged in.`, 4000);
@@ -66,12 +81,35 @@ const App = () => {
     setUser(null);
   };
 
+  const handleCreatePost = async (ev) => {
+    ev.preventDefault();
+
+    const newPost = {
+      title,
+      author,
+      url,
+    };
+
+    try {
+      const postCreated = await blogService.create(newPost);
+      setPosts(posts.concat(postCreated));
+      setTitle("");
+      setAuthor("");
+      setUrl("");
+    } catch (error) {
+      handleMessage(`There was an error creating post: ${error.message}`, 4000);
+      setTitle("");
+      setAuthor("");
+      setUrl("");
+    }
+  };
+
   return (
-    <div>
+    <div className="container">
       {message && <Notification message={message} />}
       {!user ? (
         // LOG IN FORM
-        <div>
+        <div className="login">
           <h1>Log in to application</h1>
           <FormLogin
             handleLogin={handleLogin}
@@ -82,16 +120,25 @@ const App = () => {
           />
         </div>
       ) : (
-        // BLOGS
-        <div>
-          <h1>blogs</h1>
-          <h2>
-            {user.name.toUpperCase()} logged in{" "}
-            <button onClick={handleLogout}>Log out</button>
-          </h2>
-          {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
-          ))}
+        <div className="blog-content">
+          <BlogHeader user={user} handleLogout={handleLogout} />
+          <div className="main">
+            <FormPosts
+              handleCreatePost={handleCreatePost}
+              title={title}
+              setTitle={setTitle}
+              author={author}
+              setAuthor={setAuthor}
+              url={url}
+              setUrl={url}
+            />
+            <ul className="posts-list">
+              <h2>POSTS</h2>
+              {posts.map((post) => (
+                <Post key={post.id} post={post} />
+              ))}
+            </ul>
+          </div>
         </div>
       )}
     </div>
