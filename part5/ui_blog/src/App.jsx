@@ -12,6 +12,11 @@ import BlogHeader from "./components/BlogHeader";
 const App = () => {
   const [posts, setPosts] = useState([]);
   const [message, setMessage] = useState(null);
+  const [notClassName, setNotClassName] = useState(null);
+
+  const SUCCESS_CLASS = "success";
+  const ERROR_CLASS = "error";
+  const INFO_CLASS = "info";
 
   // ***********************
   // ******** LOGIN ********
@@ -36,18 +41,17 @@ const App = () => {
   // CHECK if a USER is already logged in
   useEffect(() => {
     const userLoggedIn = window.localStorage.getItem(LOCAL_STORAGE_USER_KEY);
-
     if (userLoggedIn) {
       const user = JSON.parse(userLoggedIn);
       setUser(user);
       // TODO: GET TOKEN and use it to create new posts using setToken
     }
-
     // return () => {};
   }, []);
 
-  const handleMessage = (message, timeout) => {
+  const handleMessage = (message, timeout, className) => {
     setMessage(message);
+    setNotClassName(className);
     setTimeout(() => {
       setMessage(null);
     }, timeout);
@@ -55,21 +59,23 @@ const App = () => {
 
   const handleLogin = async (ev) => {
     ev.preventDefault();
-    console.log(`Logged in with: ${username} ${password}`);
 
     try {
       const user = await authService.login({ username, password });
-      console.log("USER LOGIN: ", user);
+
       window.localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(user));
       blogService.setToken(user.token);
-      console.log("TOKEN LOGIN: ", user.token);
 
       setUser(user);
-      handleMessage(`Welcome, ${user.name}. You are logged in.`, 4000);
+      handleMessage(
+        `Welcome, ${user.name}. You are logged in.`,
+        4000,
+        SUCCESS_CLASS
+      );
       setUsername("");
       setPassword("");
     } catch (error) {
-      handleMessage(`Wrong credentials, ${error.message}`, 5000);
+      handleMessage(`Wrong credentials, ${error.message}`, 5000, ERROR_CLASS);
       setUsername("");
       setPassword("");
     }
@@ -77,7 +83,7 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.clear();
-    handleMessage(`You are logged out.`, 4000);
+    handleMessage(`You are logged out.`, 4000, INFO_CLASS);
     setUser(null);
   };
 
@@ -93,11 +99,27 @@ const App = () => {
     try {
       const postCreated = await blogService.create(newPost);
       setPosts(posts.concat(postCreated));
+      handleMessage(
+        `A new Post "${postCreated.title}" by ${postCreated.author} added`,
+        4000,
+        SUCCESS_CLASS
+      );
       setTitle("");
       setAuthor("");
       setUrl("");
     } catch (error) {
-      handleMessage(`There was an error creating post: ${error.message}`, 4000);
+      let errorMessage;
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else {
+        errorMessage = error.message || "An unknown error occurred";
+      }
+      handleMessage(
+        `There was an error creating post: ${errorMessage}`,
+        4000,
+        ERROR_CLASS
+      );
+
       setTitle("");
       setAuthor("");
       setUrl("");
@@ -106,11 +128,10 @@ const App = () => {
 
   return (
     <div className="container">
-      {message && <Notification message={message} />}
+      {message && <Notification message={message} className={notClassName} />}
       {!user ? (
         // LOG IN FORM
         <div className="login">
-          <h1>Log in to application</h1>
           <FormLogin
             handleLogin={handleLogin}
             username={username}

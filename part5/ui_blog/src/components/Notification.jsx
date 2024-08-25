@@ -1,6 +1,6 @@
-function Notification({ message }) {
+function Notification({ message, className }) {
   if (!message) return null;
-  return <div>{message}</div>;
+  return <div className={`${className}`}>{message}</div>;
 }
 
 export default Notification;
