@@ -130,7 +130,7 @@ const App = () => {
               author={author}
               setAuthor={setAuthor}
               url={url}
-              setUrl={url}
+              setUrl={setUrl}
             />
             <ul className="posts-list">
               <h2>POSTS</h2>
