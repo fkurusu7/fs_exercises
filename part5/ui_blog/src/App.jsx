@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 import blogService from "./services/posts";
-import authService from "./services/authentication";
+
 import Notification from "./components/Notification";
 import FormLogin from "./components/FormLogin";
 import FormPosts from "./components/FormPosts";
@@ -20,8 +20,6 @@ const App = () => {
 
   // ***********************
   // ******** LOGIN ********
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const LOCAL_STORAGE_USER_KEY = "loggedInUser";
   // ***********************
@@ -55,30 +53,6 @@ const App = () => {
     setTimeout(() => {
       setMessage(null);
     }, timeout);
-  };
-
-  const handleLogin = async (ev) => {
-    ev.preventDefault();
-
-    try {
-      const user = await authService.login({ username, password });
-
-      window.localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(user));
-      blogService.setToken(user.token);
-
-      setUser(user);
-      handleMessage(
-        `Welcome, ${user.name}. You are logged in.`,
-        4000,
-        SUCCESS_CLASS
-      );
-      setUsername("");
-      setPassword("");
-    } catch (error) {
-      handleMessage(`Wrong credentials, ${error.message}`, 5000, ERROR_CLASS);
-      setUsername("");
-      setPassword("");
-    }
   };
 
   const handleLogout = () => {
@@ -133,11 +107,9 @@ const App = () => {
         // LOG IN FORM
         <div className="login">
           <FormLogin
-            handleLogin={handleLogin}
-            username={username}
-            setUsername={setUsername}
-            password={password}
-            setPassword={setPassword}
+            setUser={setUser}
+            lclStrUserKey={LOCAL_STORAGE_USER_KEY}
+            handleMessage={handleMessage}
           />
         </div>
       ) : (

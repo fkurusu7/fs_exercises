@@ -1,10 +1,40 @@
-function FormLogin({
-  handleLogin,
-  username,
-  setUsername,
-  password,
-  setPassword,
-}) {
+import { useState } from "react";
+
+import authService from "./../services/authentication";
+import blogService from "./../services/posts";
+
+function FormLogin({ setUser, lclStrUserKey, handleMessage }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const SUCCESS_CLASS = "success";
+  const ERROR_CLASS = "error";
+  const INFO_CLASS = "info";
+
+  const handleLogin = async (ev) => {
+    ev.preventDefault();
+
+    try {
+      const user = await authService.login({ username, password });
+
+      window.localStorage.setItem(lclStrUserKey, JSON.stringify(user));
+      blogService.setToken(user.token);
+
+      setUser(user);
+      handleMessage(
+        `Welcome, ${user.name}. You are logged in.`,
+        4000,
+        SUCCESS_CLASS
+      );
+      setUsername("");
+      setPassword("");
+    } catch (error) {
+      handleMessage(`Wrong credentials, ${error.message}`, 5000, ERROR_CLASS);
+      setUsername("");
+      setPassword("");
+    }
+  };
+
   return (
     <form className="form" onSubmit={handleLogin}>
       <h1>Log in to application</h1>
