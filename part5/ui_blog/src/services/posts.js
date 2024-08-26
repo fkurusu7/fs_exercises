@@ -11,7 +11,6 @@ const setToken = (newToken) => (token = `Bearer ${newToken}`);
 
 const create = async (newPost) => {
   const config = { headers: { Authorization: token } };
-
   const res = await axios.post(BASE_POSTS_PATH, newPost, config);
   return res.data;
 };

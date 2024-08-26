@@ -102,7 +102,7 @@ ul {
 .main {
   display: flex;
   align-items: start;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
 .posts-list {
@@ -162,7 +162,8 @@ ul {
   outline: 1px solid var(--color-brand--2);
 }
 
-.form button {
+.form button,
+.main button {
   background-color: transparent;
   border: 1px solid var(--color-brand--2);
   border-radius: 1rem;
@@ -174,13 +175,32 @@ ul {
   align-self: flex-end;
 }
 .form button:hover,
-.form button:active {
+.form button:active,
+.main button:hover,
+.main button:active {
   color: var(--color-dark--1);
   background-color: var(--color-brand--2);
 }
 
-.form button:active {
+.form button:active,
+.main button:active,
+.btns .btn-cancel:active {
   transform: translateY(0.3rem);
+}
+
+.btns {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.btns .btn-cancel {
+  border: 1px solid var(--color-brand--3);
+  color: var(--color-brand--3);
+}
+.btns .btn-cancel:hover {
+  background-color: var(--color-brand--3);
+  color: var(--color-dark--2);
 }
 
 .posts-list {

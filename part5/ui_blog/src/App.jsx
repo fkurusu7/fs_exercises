@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-
 import blogService from "./services/posts";
-
 import Notification from "./components/Notification";
 import FormLogin from "./components/FormLogin";
 import FormPosts from "./components/FormPosts";
@@ -13,23 +11,11 @@ const App = () => {
   const [posts, setPosts] = useState([]);
   const [message, setMessage] = useState(null);
   const [notClassName, setNotClassName] = useState(null);
-
-  const SUCCESS_CLASS = "success";
-  const ERROR_CLASS = "error";
-  const INFO_CLASS = "info";
-
-  // ***********************
-  // ******** LOGIN ********
   const [user, setUser] = useState(null);
-  const LOCAL_STORAGE_USER_KEY = "loggedInUser";
-  // ***********************
+  const [showNewPostForm, setShowNewPostForm] = useState(false);
 
-  // ***************************
-  // ******** NEW POSTS ********
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
-  // ***************************
+  const LOCAL_STORAGE_USER_KEY = "loggedInUser";
+  const INFO_CLASS = "info";
 
   // LOAD ALL POSTS From DB
   useEffect(() => {
@@ -39,12 +25,12 @@ const App = () => {
   // CHECK if a USER is already logged in
   useEffect(() => {
     const userLoggedIn = window.localStorage.getItem(LOCAL_STORAGE_USER_KEY);
+
     if (userLoggedIn) {
       const user = JSON.parse(userLoggedIn);
       setUser(user);
-      // TODO: GET TOKEN and use it to create new posts using setToken
+      blogService.setToken(user.token);
     }
-    // return () => {};
   }, []);
 
   const handleMessage = (message, timeout, className) => {
@@ -59,45 +45,6 @@ const App = () => {
     window.localStorage.clear();
     handleMessage(`You are logged out.`, 4000, INFO_CLASS);
     setUser(null);
-  };
-
-  const handleCreatePost = async (ev) => {
-    ev.preventDefault();
-
-    const newPost = {
-      title,
-      author,
-      url,
-    };
-
-    try {
-      const postCreated = await blogService.create(newPost);
-      setPosts(posts.concat(postCreated));
-      handleMessage(
-        `A new Post "${postCreated.title}" by ${postCreated.author} added`,
-        4000,
-        SUCCESS_CLASS
-      );
-      setTitle("");
-      setAuthor("");
-      setUrl("");
-    } catch (error) {
-      let errorMessage;
-      if (error.response?.data?.error) {
-        errorMessage = error.response.data.error;
-      } else {
-        errorMessage = error.message || "An unknown error occurred";
-      }
-      handleMessage(
-        `There was an error creating post: ${errorMessage}`,
-        4000,
-        ERROR_CLASS
-      );
-
-      setTitle("");
-      setAuthor("");
-      setUrl("");
-    }
   };
 
   return (
@@ -116,15 +63,21 @@ const App = () => {
         <div className="blog-content">
           <BlogHeader user={user} handleLogout={handleLogout} />
           <div className="main">
-            <FormPosts
-              handleCreatePost={handleCreatePost}
-              title={title}
-              setTitle={setTitle}
-              author={author}
-              setAuthor={setAuthor}
-              url={url}
-              setUrl={setUrl}
-            />
+            {showNewPostForm ? (
+              <FormPosts
+                posts={posts}
+                setPosts={setPosts}
+                handleMessage={handleMessage}
+                setShowNewPostForm={setShowNewPostForm}
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowNewPostForm(!showNewPostForm)}
+              >
+                New Post
+              </button>
+            )}
             <ul className="posts-list">
               <h2>POSTS</h2>
               {posts.map((post) => (

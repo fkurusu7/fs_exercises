@@ -1,12 +1,53 @@
-function FormPosts({
-  handleCreatePost,
-  title,
-  setTitle,
-  author,
-  setAuthor,
-  url,
-  setUrl,
-}) {
+import { useState } from "react";
+import blogService from "./../services/posts";
+
+function FormPosts({ posts, setPosts, handleMessage, setShowNewPostForm }) {
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [url, setUrl] = useState("");
+
+  const SUCCESS_CLASS = "success";
+  const ERROR_CLASS = "error";
+
+  const handleCreatePost = async (ev) => {
+    ev.preventDefault();
+
+    const newPost = {
+      title,
+      author,
+      url,
+    };
+
+    try {
+      const postCreated = await blogService.create(newPost);
+      setPosts(posts.concat(postCreated));
+      handleMessage(
+        `A new Post "${postCreated.title}" by ${postCreated.author} added`,
+        4000,
+        SUCCESS_CLASS
+      );
+      setTitle("");
+      setAuthor("");
+      setUrl("");
+      setShowNewPostForm((show) => !show);
+    } catch (error) {
+      let errorMessage;
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else {
+        errorMessage = error.message || "An unknown error occurred";
+      }
+      handleMessage(
+        `There was an error creating post: ${errorMessage}`,
+        4000,
+        ERROR_CLASS
+      );
+
+      setTitle("");
+      setAuthor("");
+      setUrl("");
+    }
+  };
   return (
     <form className="form" onSubmit={handleCreatePost}>
       <h2>Create a Post</h2>
@@ -44,7 +85,16 @@ function FormPosts({
           />
         </div>
       </div>
-      <button type="submit">create post</button>
+      <div className="btns">
+        <button
+          className="btn-cancel"
+          type="button"
+          onClick={() => setShowNewPostForm((show) => !show)}
+        >
+          Cancel
+        </button>
+        <button type="submit">create post</button>
+      </div>
     </form>
   );
 }
