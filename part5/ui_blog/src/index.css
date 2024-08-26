@@ -101,8 +101,9 @@ ul {
 /* POSTS - form and list */
 .main {
   display: flex;
-  align-items: start;
-  justify-content: space-around;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .posts-list {
@@ -225,6 +226,7 @@ ul {
 .posts-list li {
   color: var(--color-light--3);
   font-size: 1.4rem;
+  margin-bottom: 0.6rem;
 }
 
 .posts-list li > .title {
@@ -232,6 +234,12 @@ ul {
   font-size: 1.9rem;
   margin-right: 0.5rem;
 }
+.posts-list li > .title button {
+  margin-left: 1rem;
+  font-size: 1.3rem;
+  padding: 0.3rem 1.2rem;
+}
+
 .posts-list li > .author {
   color: var(--color-light--2);
   font-size: 1.6rem;

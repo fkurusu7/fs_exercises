@@ -71,12 +71,14 @@ const App = () => {
                 setShowNewPostForm={setShowNewPostForm}
               />
             ) : (
-              <button
-                type="button"
-                onClick={() => setShowNewPostForm(!showNewPostForm)}
-              >
-                New Post
-              </button>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setShowNewPostForm(!showNewPostForm)}
+                >
+                  New Post
+                </button>
+              </div>
             )}
             <ul className="posts-list">
               <h2>POSTS</h2>
