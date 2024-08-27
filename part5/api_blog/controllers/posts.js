@@ -69,17 +69,20 @@ postsRouter.delete("/:id", async (req, res, next) => {
     // if (!decodedToken) {
     //   return res.status(401).json({ error: "invalid token" });
     // }
-    const user = req.user;
-    logger.info(`USER route: ${user}`);
+    // const user = req.user;
+    // console.log(`USER route: ${user}`);
+    // const userId = req.id;
 
-    const userId = req.id;
     const postId = req.params.id;
 
-    const result = await Post.deleteOne({ _id: postId, user: userId });
+    // const result = await Post.deleteOne({ _id: postId, user: userId });
+    const result = await Post.deleteOne({ _id: postId });
 
     if (result.deletedCount === 1) {
       res.status(204).end();
     } else {
+      console.log("ERROR, ", result);
+
       res.status(400).json({ error: "post not found" });
     }
   } catch (error) {

@@ -11,18 +11,17 @@ const helper = require("./../tests/test_helper");
 const USER_BASE_PATH = "/api/users";
 const api = supertest(app);
 
-describe("", (params) => {
+describe("creating users", (params) => {
   beforeEach(async () => {
     await User.deleteMany({});
 
     const passwordHash = await bcrypt.hash("password", 10);
     const user = new User({ username: "root", passwordHash });
     await user.save();
-
-    await api.post();
   });
 
   test("should return one user", async () => {
+    console.log("# USERS: ", helper.usersInDB());
     await api
       .get(USER_BASE_PATH)
       .expect(200)
