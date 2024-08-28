@@ -55,9 +55,36 @@ postsRouter.post("/", middleware.userExtractor, async (req, res, next) => {
     await user.save();
     res.status(201).json(savedPost);
   } catch (error) {
-    // console.log("ERROR POST: ", error.message);
-    // console.log("ERROR POST: ", error.name);
+    console.log("ERROR POST: ", error.message);
+    console.log("ERROR POST: ", error.name);
 
+    next(error);
+  }
+});
+
+// UPDATE a Post
+postsRouter.put("/:id", middleware.userExtractor, async (req, res, next) => {
+  const id = req.params.id;
+  const { title, author, url, likes } = req.body;
+  // console.log("BODY put: ", req.body);
+  const user = req.user;
+  // console.log("PUT, user: ", user);
+
+  try {
+    const updatedPost = await Post.findByIdAndUpdate(
+      id,
+      { title, author, url, likes },
+      { new: true, runValidators: true, context: "query" }
+    );
+
+    if (!updatedPost) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    // console.log("POST after updated: ", updatedPost);
+
+    res.status(200).json(updatedPost);
+  } catch (error) {
     next(error);
   }
 });
@@ -85,28 +112,6 @@ postsRouter.delete("/:id", async (req, res, next) => {
 
       res.status(400).json({ error: "post not found" });
     }
-  } catch (error) {
-    next(error);
-  }
-});
-
-// UPDATE a Post
-postsRouter.put("/:id", async (req, res, next) => {
-  const id = req.params.id;
-  const { title, author, url, likes } = req.body;
-
-  try {
-    const updatedPost = await Post.findByIdAndUpdate(
-      id,
-      { title, author, url, likes },
-      { new: true, runValidators: true, context: "query" }
-    );
-
-    if (!updatedPost) {
-      return res.status(404).json({ error: "Post not found" });
-    }
-
-    res.status(200).json(updatedPost);
   } catch (error) {
     next(error);
   }

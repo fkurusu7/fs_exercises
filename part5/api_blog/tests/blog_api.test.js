@@ -1,4 +1,4 @@
-const { test, beforeEach, after, describe } = require("node:test");
+const { test, beforeEach, after, describe, afterEach } = require("node:test");
 const assert = require("node:assert");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
@@ -13,7 +13,7 @@ const api = supertest(app);
 const POSTS_BASE_PATH = "/api/blog/posts";
 const LOGIN_BASE_PATH = "/api/login";
 
-describe("There is initially some posts saved", () => {
+describe("There's a post in DB", () => {
   beforeEach(async () => {
     await Post.deleteMany();
     await User.deleteMany({});
@@ -30,7 +30,100 @@ describe("There is initially some posts saved", () => {
     // console.log(`==> Test DB setup done.`);
   });
 
-  describe("GET notes", () => {
+  describe("Update Posts", () => {
+    let loggedInUser = null;
+
+    beforeEach(async () => {
+      const passwordHash = await bcrypt.hash("password", 10);
+      const newUserObj = new User({
+        username: "kurusu",
+        name: "ferunando",
+        passwordHash,
+      });
+      await newUserObj.save();
+
+      const loginObj = {
+        username: "kurusu",
+        password: "password",
+      };
+
+      const loginRes = await api.post(LOGIN_BASE_PATH).send(loginObj);
+      loggedInUser = loginRes.body;
+      // console.log("LOGGED: ", loggedInUser);
+    });
+
+    afterEach(async () => {
+      await Post.deleteMany({});
+      await User.deleteMany({});
+    });
+
+    test("should update author", async () => {
+      const posts = await helper.postsInDB();
+      const postUpdateAuthor = posts[0];
+      const newAuthorName = "Feliciano";
+      postUpdateAuthor.author = newAuthorName;
+
+      const updatedPost = await api
+        .put(`${POSTS_BASE_PATH}/${postUpdateAuthor.id}`)
+        .set("Authorization", `Bearer ${loggedInUser.token}`)
+        .send(postUpdateAuthor)
+        .expect(200);
+
+      assert.strictEqual(updatedPost.body.author, newAuthorName);
+    });
+
+    test.only("should update likes", async () => {
+      const posts = await helper.postsInDB();
+      const postToUpdateLikes = posts[1];
+      postToUpdateLikes.likes = postToUpdateLikes.likes + 1;
+
+      const updatedPost = await api
+        .put(`${POSTS_BASE_PATH}/${postToUpdateLikes.id}`)
+        .set("Authorization", `Bearer ${loggedInUser.token}`)
+        .send(postToUpdateLikes)
+        .expect(200);
+
+      assert.strictEqual(updatedPost.body.likes, 4);
+    });
+
+    test.only("should not update post if not logged in", async () => {
+      const posts = await helper.postsInDB();
+      const postToUpdateLikes = posts[1];
+      postToUpdateLikes.likes = postToUpdateLikes.likes + 1;
+
+      const updatedPost = await api
+        .put(`${POSTS_BASE_PATH}/${postToUpdateLikes.id}`)
+        .send(postToUpdateLikes)
+        .expect(401);
+
+      const postsAfterUpdate = await helper.postsInDB();
+      const postNotUpdated = postsAfterUpdate[1];
+      assert.strictEqual(postNotUpdated.likes, 3);
+    });
+
+    test("should not update if post do not exist", async () => {
+      const postUpdate = {
+        title: "no post",
+        author: "no update",
+        url: "http://noupdate.com",
+        likes: 1,
+      };
+      const id = await helper.nonExistingID();
+      await api
+        .put(`${POSTS_BASE_PATH}/${id}`)
+        .set("Authorization", `Bearer ${loggedInUser.token}`)
+        .send(postUpdate)
+        .expect(404)
+        .expect("Content-Type", /application\/json/);
+      // // Check the response body
+      // .expect((res) => res.body)
+      // .toHaveProperty("error")
+      // .expect((res) => res.body.error)
+      // .toBe("Post not found");
+    });
+  });
+
+  describe("GET Posts", () => {
     test("should return posts in JSON format", async () => {
       await api
         .get(POSTS_BASE_PATH)
@@ -108,8 +201,8 @@ describe("There is initially some posts saved", () => {
         .post(POSTS_BASE_PATH)
         .set("Authorization", `Bearer ${userFromToken.token}`)
         .send(newPostWithoutLikes)
-        .expect(400)
-        .then((res) => console.log(res.body));
+        .expect(400);
+      // .then((res) => console.log(res.body));
     });
 
     test("should return status code 401 Unauthorized if token not provided", async () => {
@@ -134,7 +227,7 @@ describe("There is initially some posts saved", () => {
       const actualPosts = await helper.postsInDB();
       const actual = actualPosts.length;
       const postToDelete = actualPosts[0];
-      console.log("DELETE: ", postToDelete);
+      // console.log("DELETE: ", postToDelete);
 
       await api.delete(`${POSTS_BASE_PATH}/${postToDelete.id}`).expect(204);
       const expectedPosts = await helper.postsInDB();
@@ -149,75 +242,8 @@ describe("There is initially some posts saved", () => {
     });
   });
 
-  describe("Update Posts", async () => {
-    let loggedInUser = null;
-    beforeEach(async () => {
-      await User.deleteMany();
-      const passwordHash = await bcrypt.hash("password", 10);
-      const newUserObj = new User({
-        username: "kurusu",
-        name: "ferunando",
-        passwordHash,
-      });
-
-      const loginObj = {
-        username: "kurusu",
-        password: "password",
-      };
-      const loginRes = await api.post(LOGIN_BASE_PATH).send(loginObj);
-      loggedInUser = loginRes.body;
-    });
-
-    test("should update author", async () => {
-      const posts = await helper.postsInDB();
-      const postUpdateAuthor = posts[0];
-      const newAuthorName = "Feliciano";
-      postUpdateAuthor.author = newAuthorName;
-
-      const updatedPost = await api
-        .put(`${POSTS_BASE_PATH}/${postUpdateAuthor.id}`)
-        .send(postUpdateAuthor)
-        .expect(200);
-
-      assert.strictEqual(updatedPost.body.author, newAuthorName);
-    });
-
-    test.only("should update likes", async () => {
-      const posts = await helper.postsInDB();
-      console.log("POSTS in DB: ", posts);
-      const postUpdateLikes = posts[1];
-      console.log("POST before updating: \n ", postUpdateLikes);
-      postUpdateLikes.likes = postUpdateLikes.likes + 1;
-      console.log("POST after updating: \n ", postUpdateLikes);
-
-      const updatedPost = await api
-        .put(`${POSTS_BASE_PATH}/${postUpdateLikes.id}`)
-        .send(postUpdateLikes)
-        .expect(200);
-
-      assert.strictEqual(updatedPost.body.likes, 4);
-    });
-
-    test("should not update if post do not exist", async () => {
-      const postUpdate = {
-        title: "no post",
-        author: "no update",
-        url: "http://noupdate.com",
-        likes: 1,
-      };
-      const id = await helper.nonExistingID();
-      await api
-        .put(`${POSTS_BASE_PATH}/${id}`)
-        .send(postUpdate)
-        .expect(404)
-        .expect("Content-Type", /application\/json/);
-      // // Check the response body
-      // .expect((res) => res.body)
-      // .toHaveProperty("error")
-      // .expect((res) => res.body.error)
-      // .toBe("Post not found");
-    });
+  after(async () => {
+    await User.deleteMany({});
+    await mongoose.connection.close();
   });
 });
-
-after(async () => await mongoose.connection.close());

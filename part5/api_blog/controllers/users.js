@@ -18,6 +18,7 @@ usersRouter.get("/", async (req, res, next) => {
 
 usersRouter.post("/", async (req, res, next) => {
   const { username, name, password } = req.body;
+  // console.log("POST: ", req.body);
 
   if (password.length <= 3) {
     return res
@@ -35,10 +36,14 @@ usersRouter.post("/", async (req, res, next) => {
       name,
       passwordHash,
     });
+    // console.log("USER obj: ", user);
+
     const savedUser = await user.save();
+    // console.log("USER saved: ", savedUser);
     // save user, return 201 json
     res.status(201).json(savedUser);
   } catch (error) {
+    // console.log(error);
     next(error);
   }
 });
