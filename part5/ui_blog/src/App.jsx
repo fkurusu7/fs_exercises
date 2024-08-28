@@ -4,8 +4,9 @@ import Notification from "./components/Notification";
 import FormLogin from "./components/FormLogin";
 import FormPosts from "./components/FormPosts";
 import Post from "./components/Post";
-import "./index.css";
 import BlogHeader from "./components/BlogHeader";
+import helpers from "./utils/helpers";
+import "./index.css";
 
 const App = () => {
   const [posts, setPosts] = useState([]);
@@ -19,7 +20,12 @@ const App = () => {
 
   // LOAD ALL POSTS From DB
   useEffect(() => {
-    blogService.getAll().then((posts) => setPosts(posts));
+    async function getAllPosts() {
+      const getPosts = await blogService.getAll();
+      helpers.sortPosts(getPosts);
+      setPosts(getPosts);
+    }
+    getAllPosts();
   }, []);
 
   // CHECK if a USER is already logged in
