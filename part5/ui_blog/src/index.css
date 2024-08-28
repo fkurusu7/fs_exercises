@@ -240,7 +240,7 @@ ul {
   padding: 0.3rem 1.2rem;
 }
 
-.posts-list li > .author {
+.posts-list li > .user {
   color: var(--color-light--2);
   font-size: 1.6rem;
   margin-left: 0.5rem;
