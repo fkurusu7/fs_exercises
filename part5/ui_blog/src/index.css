@@ -185,7 +185,9 @@ ul {
 
 .form button:active,
 .main button:active,
-.btns .btn-cancel:active {
+.btns .btn-cancel:active,
+.likes-btn:active,
+.remove:active {
   transform: translateY(0.3rem);
 }
 
@@ -245,7 +247,40 @@ ul {
   font-size: 1.6rem;
   margin-left: 0.5rem;
 }
-
+.posts-list li > .likes {
+  color: var(--color-light--3);
+  font-size: 1.4rem;
+  margin-left: 0.5rem;
+}
+.posts-list li > .likes .likes-btn {
+  background-color: transparent;
+  border-color: var(--color-brand--1);
+  border-radius: 1rem;
+  color: var(--color-brand--1);
+  cursor: pointer;
+  font-size: 1.3rem;
+  margin-left: 0.5rem;
+  padding: 0.2rem 1.2rem;
+}
+.posts-list li > .likes .likes-btn:hover {
+  background-color: var(--color-brand--1);
+  border-color: var(--color-brand--1);
+  color: var(--color-dark--1);
+}
+.posts-list li > .remove {
+  background-color: transparent;
+  border-color: var(--color-brand--3);
+  border-radius: 1rem;
+  color: var(--color-brand--3);
+  cursor: pointer;
+  font-size: 1.3rem;
+  padding: 0.2rem 1.2rem;
+}
+.posts-list li > .remove:hover {
+  background-color: var(--color-brand--3);
+  border-color: var(--color-brand--3);
+  color: var(--color-dark--1);
+}
 .login {
   display: flex;
   flex-direction: column;

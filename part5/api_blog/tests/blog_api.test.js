@@ -223,7 +223,7 @@ describe("There's a post in DB", () => {
   });
 
   describe("Delete Posts", () => {
-    test("should delete a Post", async () => {
+    test("should delete a Post  and return 204 code status", async () => {
       const actualPosts = await helper.postsInDB();
       const actual = actualPosts.length;
       const postToDelete = actualPosts[0];
@@ -235,7 +235,7 @@ describe("There's a post in DB", () => {
       assert.strictEqual(actual - 1, expected);
     });
 
-    test("should delete a Post and return 204 code status", async () => {
+    test("should not delete a Post if not logged in", async () => {
       const actualPosts = await helper.postsInDB();
       const id = actualPosts[0].id;
       await api.delete(`${POSTS_BASE_PATH}/${id}`).expect(204);

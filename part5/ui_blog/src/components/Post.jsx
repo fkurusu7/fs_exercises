@@ -37,11 +37,22 @@ function Post({ post }) {
           <p className="user">{renderPost.user.username}</p>
           <p className="likes">
             Likes: {renderPost.likes}
-            <button type="button" onClick={() => handlePostLikes()}>
+            <button
+              type="button"
+              className="likes-btn"
+              onClick={() => handlePostLikes()}
+            >
               like
             </button>
           </p>
           <p className="url">{renderPost.url}</p>
+          <button
+            type="button"
+            className="remove"
+            onClick={() => console.log("DELETE")}
+          >
+            remove
+          </button>
         </>
       )}
     </li>

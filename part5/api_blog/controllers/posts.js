@@ -90,16 +90,8 @@ postsRouter.put("/:id", middleware.userExtractor, async (req, res, next) => {
 });
 
 // Delete a Post
-postsRouter.delete("/:id", async (req, res, next) => {
+postsRouter.delete("/:id", middleware.userExtractor, async (req, res, next) => {
   try {
-    // const decodedToken = jwt.verify(req.token, process.env.SECRET);
-    // if (!decodedToken) {
-    //   return res.status(401).json({ error: "invalid token" });
-    // }
-    // const user = req.user;
-    // console.log(`USER route: ${user}`);
-    // const userId = req.id;
-
     const postId = req.params.id;
 
     // const result = await Post.deleteOne({ _id: postId, user: userId });
