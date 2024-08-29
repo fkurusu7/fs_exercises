@@ -223,26 +223,87 @@ describe("There's a post in DB", () => {
   });
 
   describe("Delete Posts", () => {
+    let userFromToken = {};
+    beforeEach(async () => {
+      const loginObj = {
+        username: "before",
+        password: "password",
+      };
+      const loginRes = await api.post(LOGIN_BASE_PATH).send(loginObj);
+      userFromToken = loginRes.body;
+    });
+
     test("should delete a Post  and return 204 code status", async () => {
       const actualPosts = await helper.postsInDB();
       const actual = actualPosts.length;
       const postToDelete = actualPosts[0];
       // console.log("DELETE: ", postToDelete);
 
-      await api.delete(`${POSTS_BASE_PATH}/${postToDelete.id}`).expect(204);
+      await api
+        .delete(`${POSTS_BASE_PATH}/${postToDelete.id}`)
+        .set("Authorization", `Bearer ${userFromToken.token}`)
+        .expect(204);
       const expectedPosts = await helper.postsInDB();
       const expected = expectedPosts.length;
       assert.strictEqual(actual - 1, expected);
     });
 
-    test("should not delete a Post if not logged in", async () => {
+    test("should not delete a Post if not logged in, returns 401 status code", async () => {
       const actualPosts = await helper.postsInDB();
       const id = actualPosts[0].id;
-      await api.delete(`${POSTS_BASE_PATH}/${id}`).expect(204);
+      await api.delete(`${POSTS_BASE_PATH}/${id}`).expect(401);
+      const expectedPosts = await helper.postsInDB();
+      assert.deepStrictEqual(actualPosts, expectedPosts);
+    });
+
+    test("should delete a Post created by the logged in user", async () => {
+      const actualPosts = await helper.postsInDB();
+      const actual = actualPosts.length;
+      const postToDelete = actualPosts[0];
+      // console.log("DELETE: ", postToDelete);
+      // console.log("DELETE user: ", postToDelete.user);
+
+      await api
+        .delete(`${POSTS_BASE_PATH}/${postToDelete.id}`)
+        .set("Authorization", `Bearer ${userFromToken.token}`)
+        .expect(204);
+      const expectedPosts = await helper.postsInDB();
+      const expected = expectedPosts.length;
+      assert.strictEqual(actual - 1, expected);
+    });
+
+    test("should not delete a Post with another user which is not the logged in user", async () => {
+      const actualPosts = await helper.postsInDB();
+      const actual = actualPosts.length;
+      const postToDelete = actualPosts[0];
+
+      const passwordHash = await bcrypt.hash("password", 10);
+      const user = new User({ username: "notUSer", passwordHash });
+      await user.save();
+
+      const loginObj = {
+        username: "notUSer",
+        password: "password",
+      };
+      const loginRes = await api.post(LOGIN_BASE_PATH).send(loginObj);
+      userFromToken = loginRes.body;
+
+      // console.log("DELETE: ", postToDelete);
+      // console.log("DELETE user: ", postToDelete.user);
+      // console.log("Logged in User: ", userFromToken);
+
+      await api
+        .delete(`${POSTS_BASE_PATH}/${postToDelete.id}`)
+        .set("Authorization", `Bearer ${userFromToken.token}`)
+        .expect(400);
+      const expectedPosts = await helper.postsInDB();
+      const expected = expectedPosts.length;
+      assert.strictEqual(actual, expected);
     });
   });
 
   after(async () => {
+    await Post.deleteMany({});
     await User.deleteMany({});
     await mongoose.connection.close();
   });

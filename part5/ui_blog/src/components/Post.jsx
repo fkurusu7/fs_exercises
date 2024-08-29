@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import blogService from "./../services/posts";
-import { useEffect } from "react";
+import helpers from "./../utils/helpers";
 
-function Post({ post }) {
+function Post({ post, setPosts, handleMessage }) {
   const [renderPost, setRenderPost] = useState(post);
   const [show, setShow] = useState(false);
+
+  const SUCCESS_CLASS = "success";
+  const ERROR_CLASS = "error";
+  const INFO_CLASS = "info";
 
   const handlePostLikes = async () => {
     // console.log("Old Post:", post);
@@ -22,6 +26,27 @@ function Post({ post }) {
     const postWithCorrectUserInfo = { ...updatedPost, user: post.user };
     // console.log(postWithCorrectUserInfo);
     setRenderPost(postWithCorrectUserInfo);
+    // setPosts((prevPosts) => {
+    //   console.log(prevPosts);
+    //   // helpers.sortPosts(prevPosts);
+    //   prevPosts.map((post) =>
+    //     post.id === postWithCorrectUserInfo.id ? postWithCorrectUserInfo : post
+    //   );
+    // });
+  };
+
+  const handleRemovePost = async () => {
+    if (window.confirm(`Remove post: ${post.title} by ${post.author}`)) {
+      try {
+        const res = await blogService.remove(post.id);
+        // console.log("button remove: ", res);
+        handleMessage(`Post, ${post.title}, removed`, 4000, SUCCESS_CLASS);
+        setPosts((prevPosts) => prevPosts.filter((p) => p.id !== post.id));
+      } catch (error) {
+        const errorMsg = error.response.data.error;
+        handleMessage(`Cannot delete a ${errorMsg}`, 4000, ERROR_CLASS);
+      }
+    }
   };
 
   return (
@@ -46,11 +71,7 @@ function Post({ post }) {
             </button>
           </p>
           <p className="url">{renderPost.url}</p>
-          <button
-            type="button"
-            className="remove"
-            onClick={() => console.log("DELETE")}
-          >
+          <button type="button" className="remove" onClick={handleRemovePost}>
             remove
           </button>
         </>

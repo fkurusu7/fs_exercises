@@ -27,4 +27,12 @@ const update = async (id, newPost) => {
   return res.data;
 };
 
-export default { getAll, create, update, setToken };
+const remove = async (id) => {
+  // console.log("REMOVE id: ", id);
+  const config = { headers: { Authorization: token } };
+  const res = await axios.delete(`${BASE_POSTS_PATH}/${id}`, config);
+  // console.log(res);
+  return res.data;
+};
+
+export default { getAll, create, update, remove, setToken };

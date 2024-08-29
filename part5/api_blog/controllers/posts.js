@@ -93,17 +93,20 @@ postsRouter.put("/:id", middleware.userExtractor, async (req, res, next) => {
 postsRouter.delete("/:id", middleware.userExtractor, async (req, res, next) => {
   try {
     const postId = req.params.id;
+    const user = req.user;
+    const post = await Post.find({ _id: postId, user: user });
 
-    // const result = await Post.deleteOne({ _id: postId, user: userId });
-    const result = await Post.deleteOne({ _id: postId });
-
-    if (result.deletedCount === 1) {
-      res.status(204).end();
+    if (post.length !== 0) {
+      const result = await Post.deleteOne({ _id: postId });
+      if (result.deletedCount === 1) {
+        res.status(204).end();
+      } else {
+        res.status(400).json({ error: "post not found" });
+      }
     } else {
-      console.log("ERROR, ", result);
-
-      res.status(400).json({ error: "post not found" });
+      return res.status(400).json({ error: "Post created by another user" });
     }
+    // const result = await Post.deleteOne({ _id: postId, user: userId });
   } catch (error) {
     next(error);
   }

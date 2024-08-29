@@ -90,7 +90,12 @@ const App = () => {
             <ul className="posts-list">
               <h2>POSTS</h2>
               {posts.map((post) => (
-                <Post key={post.id} post={post} />
+                <Post
+                  key={post.id}
+                  post={post}
+                  setPosts={setPosts}
+                  handleMessage={handleMessage}
+                />
               ))}
             </ul>
           </div>

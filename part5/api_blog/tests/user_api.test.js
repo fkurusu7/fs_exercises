@@ -21,6 +21,7 @@ describe("creating users", (params) => {
     await userObj.save();
     // console.log("# USERS after saving: ", await helper.usersInDB());
   });
+
   afterEach(async () => {
     await User.deleteMany({});
   });
