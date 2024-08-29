@@ -75,6 +75,7 @@ const App = () => {
                 setPosts={setPosts}
                 handleMessage={handleMessage}
                 setShowNewPostForm={setShowNewPostForm}
+                user={user}
               />
             ) : (
               <div>

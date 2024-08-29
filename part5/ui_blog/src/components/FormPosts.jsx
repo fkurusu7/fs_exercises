@@ -1,7 +1,13 @@
 import { useState } from "react";
 import blogService from "./../services/posts";
 
-function FormPosts({ posts, setPosts, handleMessage, setShowNewPostForm }) {
+function FormPosts({
+  posts,
+  setPosts,
+  handleMessage,
+  setShowNewPostForm,
+  user,
+}) {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
@@ -20,7 +26,10 @@ function FormPosts({ posts, setPosts, handleMessage, setShowNewPostForm }) {
 
     try {
       const postCreated = await blogService.create(newPost);
-      setPosts(posts.concat(postCreated));
+      // console.log("POST Created: ", postCreated);
+      // console.log("usER?:", user);
+
+      setPosts(posts.concat({ ...postCreated, user: user }));
       handleMessage(
         `A new Post "${postCreated.title}" by ${postCreated.author} added`,
         4000,
