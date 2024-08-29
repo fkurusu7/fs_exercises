@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import blogService from "./../services/posts";
-import helpers from "./../utils/helpers";
 
 function Post({ post, setPosts, handleMessage }) {
   const [renderPost, setRenderPost] = useState(post);
@@ -80,4 +80,9 @@ function Post({ post, setPosts, handleMessage }) {
   );
 }
 
+Post.propTypes = {
+  post: PropTypes.object.isRequired,
+  setPosts: PropTypes.func.isRequired,
+  handleMessage: PropTypes.func.isRequired,
+};
 export default Post;
