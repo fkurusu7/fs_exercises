@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Post from "./../components/Post";
 import blogService from "./../services/posts";
+import FormPosts from "../components/FormPosts";
 
 test("should check a post renders the title and author, but do not render its url or likes fields", async () => {
   const post = {
@@ -109,4 +110,32 @@ describe("Post component", () => {
     // Check if the update function was called twice
     expect(blogService.update).toHaveBeenCalledTimes(2);
   });
+});
+
+test("should test the new blog form", async () => {
+  const mockPosts = [];
+  const mockSetPosts = vi.fn();
+  const mockHandleMessage = vi.fn();
+  const mockSetShowNewPostForm = vi.fn();
+  const user = { username: "kurusu" };
+  const userEv = userEvent.setup();
+
+  const { container } = render(
+    <FormPosts
+      handleMessage={mockHandleMessage}
+      posts={mockPosts}
+      setPosts={mockSetPosts}
+      setShowNewPostForm={mockSetShowNewPostForm}
+      user={user}
+    />
+  );
+  const inputTitle = container.querySelector("#title");
+  const inputAuthor = container.querySelector("#author");
+  const inputUrl = container.querySelector("#url");
+  const submitButton = screen.getByText("create post");
+
+  await userEv.type(inputTitle, "testing a form...");
+  await userEv.type(inputAuthor, "testing a form...");
+  await userEv.type(inputUrl, "testing a form...");
+  await userEv.click(submitButton);
 });
