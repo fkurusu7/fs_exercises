@@ -1,0 +1,19 @@
+{
+  "name": "e2e",
+  "version": "1.0.0",
+  "description": "End to End tests",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "e2e",
+    "react",
+    "tests"
+  ],
+  "author": "fk",
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.46.1"
+  }
+}
