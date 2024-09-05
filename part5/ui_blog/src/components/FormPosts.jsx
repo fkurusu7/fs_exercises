@@ -69,6 +69,7 @@ function FormPosts({
             id="title"
             value={title}
             onChange={({ target }) => setTitle(target.value)}
+            data-testid="title"
           />
         </div>
 
@@ -80,6 +81,7 @@ function FormPosts({
             id="author"
             value={author}
             onChange={({ target }) => setAuthor(target.value)}
+            data-testid="author"
           />
         </div>
 
@@ -91,6 +93,7 @@ function FormPosts({
             id="url"
             value={url}
             onChange={({ target }) => setUrl(target.value)}
+            data-testid="url"
           />
         </div>
       </div>

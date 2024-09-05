@@ -52,4 +52,33 @@ describe("Blog App - Log in", () => {
       await expect(errorElement).toContainText(errorMsg);
     });
   });
+
+  describe("When Logged in", () => {
+    beforeEach(async ({ page, request }) => {
+      await setupTestEnvironment(request);
+      await loginUser(page, "testeruser", "password");
+    });
+
+    test("should create a new post", async ({ page }) => {
+      // open post form
+      await page.getByRole("button", { name: "New Post" }).click();
+
+      // populate textboxes
+      const title = "a blog post from e2e";
+      const author = "Octavio Paz";
+      await page.getByTestId("title").fill(title);
+      await page.getByTestId("author").fill(author);
+      await page.getByTestId("url").fill("url://url.com");
+      // click create post button
+      await page.getByRole("button", { name: "create post" }).click();
+
+      // expect success message
+      const successMsg = `A new Post "${title}" by ${author} added`;
+      await expect(page.getByText(successMsg)).toBeVisible();
+
+      // expect post title is present in page (list)
+      const titlePgh = await page.locator(".title");
+      await expect(titlePgh).toContainText(title);
+    });
+  });
 });
