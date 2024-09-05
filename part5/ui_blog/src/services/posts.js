@@ -17,12 +17,12 @@ const create = async (newPost) => {
 
 const update = async (id, newPost) => {
   // console.log("ID: ", id);
-  // console.log("New Post: ", newPost);
-  // console.log("Token: ", token);
+  console.log("New Post: ", newPost);
+  console.log("Token: ", token);
 
   const config = { headers: { Authorization: token } };
   const res = await axios.put(`${BASE_POSTS_PATH}/${id}`, newPost, config);
-  // console.log(res.data);
+  console.log(res.data);
 
   return res.data;
 };

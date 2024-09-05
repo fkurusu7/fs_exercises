@@ -13,26 +13,19 @@ function Post({ post, setPosts, handleMessage }) {
   const handlePostLikes = async () => {
     // console.log("Old Post:", post);
     // console.log(post.id);
-    // console.log(post.user);
+    console.log(post.user);
     const likesUpdate = post.likes + 1;
     const newPost = {
       ...post,
       likes: likesUpdate,
     };
-    // console.log("New Post:", newPost);
+    console.log("New Post:", newPost);
 
     const updatedPost = await blogService.update(post.id, newPost);
-    // console.log(updatedPost);
+    console.log(updatedPost);
     const postWithCorrectUserInfo = { ...updatedPost, user: post.user };
-    // console.log(postWithCorrectUserInfo);
+    console.log(postWithCorrectUserInfo);
     setRenderPost(postWithCorrectUserInfo);
-    // setPosts((prevPosts) => {
-    //   console.log(prevPosts);
-    //   // helpers.sortPosts(prevPosts);
-    //   prevPosts.map((post) =>
-    //     post.id === postWithCorrectUserInfo.id ? postWithCorrectUserInfo : post
-    //   );
-    // });
   };
 
   const handleRemovePost = async () => {

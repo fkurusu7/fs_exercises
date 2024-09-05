@@ -66,9 +66,9 @@ postsRouter.post("/", middleware.userExtractor, async (req, res, next) => {
 postsRouter.put("/:id", middleware.userExtractor, async (req, res, next) => {
   const id = req.params.id;
   const { title, author, url, likes } = req.body;
-  // console.log("BODY put: ", req.body);
+  console.log("BODY put: ", req.body);
   const user = req.user;
-  // console.log("PUT, user: ", user);
+  console.log("PUT, user: ", user);
 
   try {
     const updatedPost = await Post.findByIdAndUpdate(

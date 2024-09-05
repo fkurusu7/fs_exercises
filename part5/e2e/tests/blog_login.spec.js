@@ -80,5 +80,56 @@ describe("Blog App - Log in", () => {
       const titlePgh = await page.locator(".title");
       await expect(titlePgh).toContainText(title);
     });
+
+    test("should like a post", async ({ page }) => {
+      // open post form
+      await page.getByRole("button", { name: "New Post" }).click();
+
+      // populate textboxes
+      const title = "a blog post from e2e";
+      const author = "Octavio Paz";
+      await page.getByTestId("title").fill(title);
+      await page.getByTestId("author").fill(author);
+      await page.getByTestId("url").fill("url://url.com");
+      // click create post button
+      await page.getByRole("button", { name: "create post" }).click();
+
+      // click "view" button
+      await page.getByRole("button", { name: "view" }).click();
+
+      // expect no likes
+      await expect(page.getByText("Likes: 0")).toBeVisible();
+
+      // click like button
+      await page.getByRole("button", { name: "like" }).click();
+
+      // expect likes text changes to Likes: 1
+      await expect(page.getByText("Likes: 1")).toBeVisible();
+    });
+
+    test.only("should delete a post", async ({ page }) => {
+      // open post form
+      await page.getByRole("button", { name: "New Post" }).click();
+
+      // populate textboxes
+      const title = "a blog post from e2e";
+      const author = "Octavio Paz";
+      await page.getByTestId("title").fill(title);
+      await page.getByTestId("author").fill(author);
+      await page.getByTestId("url").fill("url://url.com");
+      // click create post button
+      await page.getByRole("button", { name: "create post" }).click();
+
+      // click "view" button
+      await page.getByRole("button", { name: "view" }).click();
+
+      // click "delete" button
+      await page.getByRole("button", { name: "remove" }).click();
+      page.on("dialog", (dialog) => dialog.accept());
+      // await expect(page.getByText("a blog post from e2e")).not.toBeVisible();
+      expect(await page.getByText("a blog post from e2e").isVisible()).toBe(
+        false
+      );
+    });
   });
 });
