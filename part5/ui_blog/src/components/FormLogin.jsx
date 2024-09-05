@@ -49,6 +49,7 @@ function FormLogin({ setUser, lclStrUserKey, handleMessage }) {
             onChange={({ target }) => {
               setUsername(target.value);
             }}
+            data-testid="username"
           />
         </div>
         <div className="form-input">
@@ -59,6 +60,7 @@ function FormLogin({ setUser, lclStrUserKey, handleMessage }) {
             id="password"
             value={password}
             onChange={({ target }) => setPassword(target.value)}
+            data-testid="password"
           />
         </div>
         <button type="submit">Log in</button>
