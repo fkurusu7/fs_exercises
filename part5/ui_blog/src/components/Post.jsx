@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import blogService from "./../services/posts";
 
-function Post({ post, setPosts, handleMessage }) {
+function Post({ post, setPosts, handleMessage, user }) {
   const [renderPost, setRenderPost] = useState(post);
   const [show, setShow] = useState(false);
 
@@ -42,6 +42,8 @@ function Post({ post, setPosts, handleMessage }) {
     }
   };
 
+  console.log(renderPost.user.username, user.username);
+
   return (
     <li>
       <p className="title">
@@ -64,9 +66,11 @@ function Post({ post, setPosts, handleMessage }) {
             </button>
           </p>
           <p className="url">{renderPost.url}</p>
-          <button type="button" className="remove" onClick={handleRemovePost}>
-            remove
-          </button>
+          {user.username === renderPost.user.username && (
+            <button type="button" className="remove" onClick={handleRemovePost}>
+              remove
+            </button>
+          )}
         </>
       )}
     </li>

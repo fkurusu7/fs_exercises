@@ -7,7 +7,7 @@ function BlogHeader({ user, handleLogout }) {
       <h2>
         Welcome, <span className="username">{user.name.toUpperCase()}</span>
       </h2>
-      <button onClick={handleLogout}>
+      <button onClick={handleLogout} data-testid="logout">
         <RiLogoutCircleRLine />
       </button>
     </header>

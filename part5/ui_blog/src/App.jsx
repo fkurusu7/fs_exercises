@@ -95,6 +95,7 @@ const App = () => {
                   post={post}
                   setPosts={setPosts}
                   handleMessage={handleMessage}
+                  user={user}
                 />
               ))}
             </ul>

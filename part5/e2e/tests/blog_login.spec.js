@@ -12,12 +12,36 @@ async function setupTestEnvironment(request) {
       password: "password",
     },
   });
+  await request.post(`${BASE_URL}/api/users`, {
+    data: {
+      name: "post user",
+      username: "postuser",
+      password: "password",
+    },
+  });
 }
 
 async function loginUser(page, username, password) {
   await page.getByTestId("username").fill(username);
   await page.getByTestId("password").fill(password);
   await page.getByRole("button", { name: "Log in" }).click();
+}
+
+async function createPostWithLoggedInUser(page) {
+  // Login with another user
+  await loginUser(page, "postuser", "password");
+  await page.getByRole("button", { name: "New Post" }).click();
+
+  // populate textboxes
+  const title = "a blog post from diff user";
+  const author = "Gabriel Garcia";
+  await page.getByTestId("title").fill(title);
+  await page.getByTestId("author").fill(author);
+  await page.getByTestId("url").fill("url://url.com");
+  // click create post button
+  await page.getByRole("button", { name: "create post" }).click();
+  // Log out
+  await page.getByTestId("logout").click();
 }
 
 describe("Blog App - Log in", () => {
@@ -56,6 +80,7 @@ describe("Blog App - Log in", () => {
   describe("When Logged in", () => {
     beforeEach(async ({ page, request }) => {
       await setupTestEnvironment(request);
+
       await loginUser(page, "testeruser", "password");
     });
 
@@ -107,7 +132,7 @@ describe("Blog App - Log in", () => {
       await expect(page.getByText("Likes: 1")).toBeVisible();
     });
 
-    test.only("should delete a post", async ({ page }) => {
+    test("should delete a post", async ({ page }) => {
       // open post form
       await page.getByRole("button", { name: "New Post" }).click();
 
@@ -130,6 +155,21 @@ describe("Blog App - Log in", () => {
       expect(await page.getByText("a blog post from e2e").isVisible()).toBe(
         false
       );
+    });
+
+    test.only("should see remove button if post was created by logged in user", async ({
+      page,
+    }) => {
+      // Log out
+      await page.getByTestId("logout").click();
+      await createPostWithLoggedInUser();
+      await loginUser(page, "postuser", "password");
+
+      // click "view" button
+      await page.getByRole("button", { name: "view" }).click();
+
+      // click "delete" button
+      expect(await page.getByRole("button", { name: "remove" }).isVisible());
     });
   });
 });
