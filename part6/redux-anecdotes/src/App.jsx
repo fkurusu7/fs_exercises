@@ -1,33 +1,46 @@
 /* eslint-disable no-unused-vars */
+import { addVote, addAnecdote } from "./reducers/anecdoteReducer";
 import { useSelector, useDispatch } from "react-redux";
-import { addVote } from "./reducers/anecdoteReducer";
 
 const App = () => {
   const anecdotes = useSelector((state) => state);
   const dispatch = useDispatch();
 
-  const vote = (id) => {
+  const sortedAnecdotes = [...anecdotes].sort((a, b) => b.votes - a.votes);
+
+  const handleAddVote = (id) => {
     dispatch(addVote(id));
+  };
+
+  const handleAddAnecdote = (ev) => {
+    ev.preventDefault();
+    const content = ev.target.anecdote.value.trim();
+    if (content) {
+      ev.target.anecdote.value = "";
+      dispatch(addAnecdote(content));
+    } else {
+      alert("Anecdote cannot be empty!");
+    }
   };
 
   return (
     <div>
       <h2>Anecdotes</h2>
-      {anecdotes.map((anecdote) => (
+      {sortedAnecdotes.map((anecdote) => (
         <div key={anecdote.id}>
           <div>{anecdote.content}</div>
           <div>
             has {anecdote.votes}
-            <button onClick={() => vote(anecdote.id)}>vote</button>
+            <button onClick={() => handleAddVote(anecdote.id)}>vote</button>
           </div>
         </div>
       ))}
       <h2>create new</h2>
-      <form>
+      <form onSubmit={handleAddAnecdote}>
         <div>
-          <input />
+          <input name="anecdote" />
         </div>
-        <button>create</button>
+        <button type="submit">create</button>
       </form>
     </div>
   );

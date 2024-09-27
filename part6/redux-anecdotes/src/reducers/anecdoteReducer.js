@@ -26,11 +26,18 @@ export const addVote = (id) => {
     payload: id,
   };
 };
+
+export const addAnecdote = (content) => {
+  return {
+    type: "ADD_ANECDOTE",
+    payload: asObject(content),
+  };
+};
 // ACTIONS end
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case "NEW_ANECDOTE":
+    case "ADD_ANECDOTE":
       return [...state, action.payload];
     case "VOTE":
       const anecdoteId = String(action.payload);
