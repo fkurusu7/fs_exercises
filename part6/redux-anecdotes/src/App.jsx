@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
-import { addVote, addAnecdote } from "./reducers/anecdoteReducer";
+import AnecdoteForm from "./components/AnecdoteForm";
+import { addVote } from "./reducers/anecdoteReducer";
 import { useSelector, useDispatch } from "react-redux";
 
 const App = () => {
@@ -10,17 +11,6 @@ const App = () => {
 
   const handleAddVote = (id) => {
     dispatch(addVote(id));
-  };
-
-  const handleAddAnecdote = (ev) => {
-    ev.preventDefault();
-    const content = ev.target.anecdote.value.trim();
-    if (content) {
-      ev.target.anecdote.value = "";
-      dispatch(addAnecdote(content));
-    } else {
-      alert("Anecdote cannot be empty!");
-    }
   };
 
   return (
@@ -36,12 +26,7 @@ const App = () => {
         </div>
       ))}
       <h2>create new</h2>
-      <form onSubmit={handleAddAnecdote}>
-        <div>
-          <input name="anecdote" />
-        </div>
-        <button type="submit">create</button>
-      </form>
+      <AnecdoteForm />
     </div>
   );
 };
