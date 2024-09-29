@@ -1,4 +1,4 @@
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { addAnecdote } from "./../reducers/anecdoteReducer";
 
 function AnecdoteForm() {
@@ -16,12 +16,15 @@ function AnecdoteForm() {
   };
 
   return (
-    <form onSubmit={handleAddAnecdote}>
-      <div>
-        <input name="anecdote" />
-      </div>
-      <button type="submit">create</button>
-    </form>
+    <>
+      <h2>create new</h2>
+      <form onSubmit={handleAddAnecdote}>
+        <div>
+          <input name="anecdote" />
+        </div>
+        <button type="submit">create</button>
+      </form>
+    </>
   );
 }
 
