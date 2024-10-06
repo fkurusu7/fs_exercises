@@ -1,3 +1,6 @@
+// The status can be converted to a human-readable format by using the current function from the immer library.
+import { createSlice, current } from "@reduxjs/toolkit";
+
 const anecdotesAtStart = [
   "If it hurts, do it more often",
   "Adding manpower to a late software project makes it later!",
@@ -19,7 +22,34 @@ const asObject = (anecdote) => {
 
 const initialState = anecdotesAtStart.map(asObject);
 
+// REDUX ToolKit
+const anecdoteSlice = createSlice({
+  name: "anecdotes",
+  initialState,
+  reducers: {
+    // ACTION CREATORS
+    addAnecdote(state, action) {
+      const anecdote = asObject(action.payload);
+      return [...state, anecdote];
+    },
+    addVote(state, action) {
+      const anecdoteId = String(action.payload);
+      return state.map((anecdote) =>
+        anecdote.id === anecdoteId
+          ? { ...anecdote, votes: anecdote.votes + 1 }
+          : anecdote
+      );
+    },
+  },
+});
+
+export const { addAnecdote, addVote } = anecdoteSlice.actions;
+export default anecdoteSlice.reducer;
+
+//********************************
+// OLD WAY
 // ACTIONS
+/*
 export const addVote = (id) => {
   return {
     type: "VOTE",
@@ -52,3 +82,4 @@ const reducer = (state = initialState, action) => {
 };
 
 export default reducer;
+*/

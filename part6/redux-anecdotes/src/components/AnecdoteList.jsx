@@ -2,6 +2,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { addVote } from "./../reducers/anecdoteReducer";
 
 function AnecdoteList() {
+  const dispatch = useDispatch();
   const anecdotes = useSelector(({ filter, anecdotes }) => {
     // No SEARCH term, so return all anecdotes
     if (filter === "") return anecdotes;
