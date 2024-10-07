@@ -1,5 +1,6 @@
 // The status can be converted to a human-readable format by using the current function from the immer library.
 import { createSlice, current } from "@reduxjs/toolkit";
+import { setNotification } from "./notificationReducer";
 
 const anecdotesAtStart = [
   "If it hurts, do it more often",
@@ -44,6 +45,18 @@ const anecdoteSlice = createSlice({
 });
 
 export const { addAnecdote, addVote } = anecdoteSlice.actions;
+
+// REDUX Thunk
+export const createAnecdote = (content) => {
+  return async (dispatch) => {
+    dispatch(addAnecdote(content));
+    dispatch(setNotification(`Anecdote added ${content}`));
+    setTimeout(() => {
+      dispatch(setNotification(null));
+    }, 5000);
+  };
+};
+
 export default anecdoteSlice.reducer;
 
 //********************************

@@ -1,5 +1,6 @@
 import { useDispatch } from "react-redux";
-import { addAnecdote } from "./../reducers/anecdoteReducer";
+import { setNotification } from "../reducers/notificationReducer";
+import { addAnecdote, createAnecdote } from "../reducers/anecdoteReducer";
 
 function AnecdoteForm() {
   const dispatch = useDispatch();
@@ -8,10 +9,11 @@ function AnecdoteForm() {
     ev.preventDefault();
     const content = ev.target.anecdote.value.trim();
     if (content) {
+      dispatch(createAnecdote(content));
       ev.target.anecdote.value = "";
-      dispatch(addAnecdote(content));
+      dispatch(setNotification(`Anecdote added: ${content}`));
     } else {
-      alert("Anecdote cannot be empty!");
+      dispatch(setNotification("Anecdote cannot be empty!"));
     }
   };
 
