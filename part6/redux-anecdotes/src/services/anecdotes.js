@@ -1,7 +1,24 @@
-import { axios } from "axios";
+import axios from "axios";
 
-const baseUrl = "https://localhost:3001/anecdotes";
+const baseUrl = "http://localhost:3001/anecdotes";
 
 const getAll = async () => {
-  const response = await axios.get(baseUrl);
+  try {
+    const response = await axios.get(baseUrl);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching anecdotes:", error);
+    throw error;
+  }
 };
+
+const createAnecdote = async (content) => {
+  const object = {
+    content,
+    votes: 0,
+  };
+  const response = await axios.post(baseUrl, object);
+  return response.data;
+};
+
+export default { getAll, createAnecdote };
