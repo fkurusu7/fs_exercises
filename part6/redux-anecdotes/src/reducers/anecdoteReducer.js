@@ -59,8 +59,9 @@ export const initializeAnecdotes = () => {
 
 export const createAnecdote = (content) => {
   return async (dispatch) => {
-    dispatch(addAnecdote(content));
-    dispatch(setNotification(`Anecdote added ${content}`));
+    const newAnecdote = await anecdotesService.createAnecdote(content);
+    dispatch(addAnecdote(newAnecdote));
+    dispatch(setNotification(`Anecdote added ${newAnecdote.content}`));
     setTimeout(() => {
       dispatch(setNotification(null));
     }, 5000);

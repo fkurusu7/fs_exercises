@@ -5,7 +5,6 @@ function AnecdoteFilter() {
   const dispatch = useDispatch();
 
   const handleChange = (ev) => {
-    console.log(ev.target.value);
     dispatch(searchAnecdote(ev.target.value));
   };
 
