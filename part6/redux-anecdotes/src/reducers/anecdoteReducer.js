@@ -10,6 +10,7 @@
 // ];
 import { createSlice, current } from "@reduxjs/toolkit";
 import { setNotification } from "./notificationReducer";
+import anecdotesService from "../services/anecdotes";
 
 const getId = () => (100000 * Math.random()).toFixed(0);
 
@@ -48,7 +49,14 @@ const anecdoteSlice = createSlice({
 
 export const { addAnecdote, addVote, setAnecdotes } = anecdoteSlice.actions;
 
-// REDUX Thunk
+// REDUX Thunks
+export const initializeAnecdotes = () => {
+  return async (dispatch) => {
+    const anecdotes = await anecdotesService.getAll();
+    dispatch(setAnecdotes(anecdotes));
+  };
+};
+
 export const createAnecdote = (content) => {
   return async (dispatch) => {
     dispatch(addAnecdote(content));
