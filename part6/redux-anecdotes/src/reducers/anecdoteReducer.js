@@ -33,6 +33,12 @@ const anecdoteSlice = createSlice({
     addAnecdote(state, action) {
       state.push(action.payload);
     },
+    updateAnecdote(state, action) {
+      const updatedAnecdote = action.payload;
+      return state.map((anecdote) =>
+        anecdote.id === updatedAnecdote.id ? updatedAnecdote : anecdote
+      );
+    },
     addVote(state, action) {
       const anecdoteId = String(action.payload);
       return state.map((anecdote) =>
@@ -47,7 +53,8 @@ const anecdoteSlice = createSlice({
   },
 });
 
-export const { addAnecdote, addVote, setAnecdotes } = anecdoteSlice.actions;
+export const { addAnecdote, updateAnecdote, setAnecdotes } =
+  anecdoteSlice.actions;
 
 // REDUX Thunks
 export const initializeAnecdotes = () => {
@@ -68,42 +75,21 @@ export const createAnecdote = (content) => {
   };
 };
 
-export default anecdoteSlice.reducer;
-
-//********************************
-// OLD WAY
-// ACTIONS
-/*
 export const addVote = (id) => {
-  return {
-    type: "VOTE",
-    payload: id,
+  return async (dispatch, getSate) => {
+    const state = getSate();
+    const anecdoteToChange = state.anecdotes.find((a) => a.id === id);
+    const updatedAnecdote = {
+      ...anecdoteToChange,
+      votes: anecdoteToChange.votes + 1,
+    };
+    const returnedAnecdote = await anecdotesService.createVote(
+      id,
+      updatedAnecdote
+    );
+
+    dispatch(updateAnecdote(returnedAnecdote));
   };
 };
 
-export const addAnecdote = (content) => {
-  return {
-    type: "ADD_ANECDOTE",
-    payload: asObject(content),
-  };
-};
-// ACTIONS end
-
-const reducer = (state = initialState, action) => {
-  switch (action.type) {
-    case "ADD_ANECDOTE":
-      return [...state, action.payload];
-    case "VOTE":
-      const anecdoteId = String(action.payload);
-      return state.map((anecdote) =>
-        anecdote.id === anecdoteId
-          ? { ...anecdote, votes: anecdote.votes + 1 }
-          : anecdote
-      );
-    default:
-      return state;
-  }
-};
-
-export default reducer;
-*/
+export default anecdoteSlice.reducer;
