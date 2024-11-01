@@ -1,16 +1,24 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useState } from "react";
-
 import { Routes, Route, Link, useNavigate, useMatch } from "react-router-dom";
+import styled from "styled-components";
+
 import { useField } from "./hooks";
+import Button from "./components/Button";
 
 const Menu = () => {
   const padding = {
     paddingRight: 5,
   };
+
+  const Navigation = styled.div`
+    background: BurlyWood;
+    padding: 1em;
+  `;
+
   return (
-    <div>
+    <Navigation>
       <Link to="/" style={padding}>
         anecdotes
       </Link>
@@ -20,7 +28,7 @@ const Menu = () => {
       <Link to="/about" style={padding}>
         about
       </Link>
-    </div>
+    </Navigation>
   );
 };
 
@@ -120,10 +128,10 @@ const CreateNew = (props) => {
           url for more info
           <input {...info.inputProps} />
         </div>
-        <button type="submit">create</button>
-        <button type="button" onClick={handleReset}>
+        <Button type="submit">create</Button>
+        <Button type="button" onClick={handleReset}>
           reset
-        </button>
+        </Button>
       </form>
     </div>
   );
